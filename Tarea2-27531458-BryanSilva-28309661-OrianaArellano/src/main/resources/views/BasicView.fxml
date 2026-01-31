@@ -1,0 +1,548 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.chart.AreaChart?>
+<?import javafx.scene.chart.LineChart?>
+<?import javafx.scene.chart.NumberAxis?>
+<?import javafx.scene.control.Accordion?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ColorPicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.RadioButton?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.Slider?>
+<?import javafx.scene.control.Spinner?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.TitledPane?>
+<?import javafx.scene.control.ToggleButton?>
+<?import javafx.scene.control.ToggleGroup?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<VBox fx:id="basicView" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="700.0" prefWidth="1000.0" style="-fx-background-color: #2b2b2b;" stylesheets="@../styles.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.BasicViewController">
+    <children>
+        <MenuBar style="-fx-background-color: #3c3f41; -fx-base: #3c3f41;">
+            <menus>
+                <Menu mnemonicParsing="false" text="Archivo">
+                    <items>
+                        <MenuItem mnemonicParsing="false" onAction="#onLoadImageClick" text="Abrir Imagen" />
+                        <MenuItem mnemonicParsing="false" onAction="#onDownLoadPNG" text="Guardar como PNG" />
+                        <MenuItem mnemonicParsing="false" onAction="#onDownLoadBMP" text="Guardar como BMP" />
+                        <MenuItem mnemonicParsing="false" onAction="#onDownLoadNetpbm" text="Guardar como Netpbm" />
+                        <MenuItem mnemonicParsing="false" onAction="#onDownLoadRLE" text="Guardar como RLE" />
+                    </items>
+                </Menu>
+                <Menu mnemonicParsing="false" text="Editar">
+                    <items>
+                        <MenuItem mnemonicParsing="false" onAction="#onOriginalButtton" text="Restaurar Original" />
+                    </items>
+                </Menu>
+                <Menu mnemonicParsing="false" text="About">
+               <items>
+                  <MenuItem mnemonicParsing="false" onAction="#onAboutClick" text="About" />
+               </items></Menu>
+            </menus>
+        </MenuBar>
+        <HBox prefHeight="600.0" prefWidth="800.0" VBox.vgrow="ALWAYS">
+            <children>
+                <VBox minWidth="260.0" prefHeight="548.0" prefWidth="260.0" style="-fx-background-color: #313335; -fx-border-color: #1e1e1e; -fx-border-width: 0 1 0 0;">
+                    <children>
+                        <HBox alignment="CENTER" spacing="10.0" style="-fx-background-color: #3c3f41; -fx-padding: 10;">
+                            <children>
+                                <Button mnemonicParsing="false" onAction="#onUndoButtonClick" prefHeight="30.0" prefWidth="100.0" style="-fx-background-color: #4b6eaf; -fx-text-fill: white;" text="Undo">
+                                    <font>
+                                        <Font name="System Bold" size="12.0" />
+                                    </font></Button>
+                                <Button mnemonicParsing="false" onAction="#onRedoButtonClick" prefHeight="30.0" prefWidth="100.0" style="-fx-background-color: #4b6eaf; -fx-text-fill: white;" text="Redo">
+                                    <font>
+                                        <Font name="System Bold" size="12.0" />
+                                    </font></Button>
+                            </children>
+                        </HBox>
+
+                        <TabPane prefHeight="548.0" prefWidth="165.0" style="-fx-tab-min-height: 30;" tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS">
+                            <tabs>
+                                <Tab text="Básicos">
+                                    <content>
+                                        <Accordion style="-fx-background-color: #3c3f41;">
+                                            <panes>
+                                                <TitledPane animated="false" text="Tonalidad">
+                                                    <content>
+                                                        <VBox spacing="10.0" style="-fx-background-color: #3c3f41;">
+                                                            <children>
+                                                                <Label text="Escala y Color" textFill="#bbbbbb">
+                                                                    <font>
+                                                                        <Font name="System Bold" size="12.0" />
+                                                                    </font>
+                                                                </Label>
+                                                                <HBox spacing="5.0">
+                                                                    <children>
+                                                                        <ToggleButton maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#onGreyscaleButtonClick" text="GrayScale" HBox.hgrow="ALWAYS" />
+                                                                        <ToggleButton maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#onNegativeButtonClick" text="Negativo" HBox.hgrow="ALWAYS" />
+                                                                    </children>
+                                                                </HBox>
+                                                                <Separator opacity="0.3" prefWidth="200.0" />
+                                                                <Label text="Color Personalizado" textFill="#bbbbbb">
+                                                                    <font>
+                                                                        <Font name="System Bold" size="12.0" />
+                                                                    </font>
+                                                                </Label>
+                                                                <ColorPicker fx:id="colorScalePicker" maxWidth="1.7976931348623157E308" />
+                                                                <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#onColorScalePickerClick" text="Aplicar Color Scale" />
+                                                            </children>
+                                                            <padding>
+                                                                <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                                            </padding>
+                                                        </VBox>
+                                                    </content>
+                                                </TitledPane>
+                                                <TitledPane animated="false" text="Transformación">
+                                                    <content>
+                                                        <ScrollPane fitToWidth="true" style="-fx-background: #3c3f41; -fx-background-color: transparent;">
+                                                            <content>
+                                                                <VBox spacing="10.0" style="-fx-background-color: #3c3f41;">
+                                                                    <children>
+                                                                        <Label text="Rotación y Espejo" textFill="#bbbbbb">
+                                                                            <font>
+                                                                                <Font name="System Bold" size="12.0" />
+                                                                            </font>
+                                                                        </Label>
+                                                                        <GridPane hgap="5.0" vgap="5.0">
+                                                                            <columnConstraints>
+                                                                                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                                                                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                                                            </columnConstraints>
+                                                                            <rowConstraints>
+                                                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                                            </rowConstraints>
+                                                                            <children>
+                                                                                <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#onRotation90Click" text="90°" />
+                                                                                <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#onRotation180Click" text="180°" GridPane.rowIndex="1" />
+                                                                                <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#onRotation270Click" text="270°" GridPane.rowIndex="2" />
+                                                                                <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#onMirrorHClick" text="Espejo H" GridPane.columnIndex="1" />
+                                                                                <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#onMirrorVClick" text="Espejo V" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                                                                            </children>
+                                                                        </GridPane>
+                                                                        <Separator opacity="0.3" prefWidth="200.0" />
+                                                                        <Label text="Zoom" textFill="#bbbbbb">
+                                                                            <font>
+                                                                                <Font name="System Bold" size="12.0" />
+                                                                            </font>
+                                                                        </Label>
+                                                                        <HBox spacing="5.0">
+                                                                            <children>
+                                                                                <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#onZoomInNearestClick" text="In (NN)" HBox.hgrow="ALWAYS" />
+                                                                                <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#onZoomInBilinearClick" text="In (Bi)" HBox.hgrow="ALWAYS" />
+                                                                            </children>
+                                                                        </HBox>
+                                                                        <HBox spacing="5.0">
+                                                                            <children>
+                                                                                <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#onZoomOutNearestClick" text="Out (NN)" HBox.hgrow="ALWAYS" />
+                                                                                <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#onZoomOutSuperSampling" text="Out (SS)" HBox.hgrow="ALWAYS" />
+                                                                            </children>
+                                                                        </HBox>
+                                                                    </children>
+                                                                    <padding>
+                                                                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                                                    </padding>
+                                                                </VBox>
+                                                            </content>
+                                                        </ScrollPane>
+                                                    </content>
+                                                </TitledPane>
+                                            </panes>
+                                        </Accordion>
+                                    </content>
+                                </Tab>
+
+                                <Tab text="Ajustes">
+                                    <content>
+                                        <ScrollPane fitToWidth="true" style="-fx-background: #3c3f41; -fx-background-color: transparent;">
+                                            <content>
+                                                <VBox spacing="15.0" style="-fx-background-color: #3c3f41;">
+                                                    <children>
+                                                        <VBox spacing="5.0" style="-fx-background-color: #313335; -fx-background-radius: 5; -fx-padding: 10;">
+                                                            <children>
+                                                                <Label text="Brillo" textFill="WHITE">
+                                                                    <font>
+                                                                        <Font name="System Bold" size="12.0" />
+                                                                    </font>
+                                                                </Label>
+                                                                <Slider fx:id="lightSlider" max="255.0" min="-255.0" />
+                                                                <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#onBrigthnessButtonClick" text="Aplicar Brillo" />
+                                                            </children>
+                                                        </VBox>
+
+                                                        <VBox spacing="5.0" style="-fx-background-color: #313335; -fx-background-radius: 5; -fx-padding: 10;">
+                                                            <children>
+                                                                <Label text="Contraste" textFill="WHITE">
+                                                                    <font>
+                                                                        <Font name="System Bold" size="12.0" />
+                                                                    </font>
+                                                                </Label>
+                                                                <Slider fx:id="contrastSlider" blockIncrement="0.1" majorTickUnit="0.5" max="2.0" showTickMarks="true" value="1.0" />
+                                                                <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#onConstrastButtonClick" text="Aplicar Contraste" />
+                                                            </children>
+                                                        </VBox>
+
+                                                        <VBox spacing="5.0" style="-fx-background-color: #313335; -fx-background-radius: 5; -fx-padding: 10;">
+                                                            <children>
+                                                                <Label text="Umbralización" textFill="WHITE">
+                                                                    <font>
+                                                                        <Font name="System Bold" size="12.0" />
+                                                                    </font>
+                                                                </Label>
+                                                                <Label text="Simple" textFill="#aaaaaa" />
+                                                                <Slider fx:id="umbralSlider" max="255.0" showTickLabels="true" showTickMarks="true" />
+                                                                <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#onUmbralButtonClick" text="Aplicar Simple" />
+
+                                                                <Separator opacity="0.1" prefWidth="200.0" />
+
+                                                                <Label text="Múltiple" textFill="#aaaaaa" />
+                                                                <HBox spacing="5.0">
+                                                                    <children>
+                                                                        <TextField fx:id="umbralMultInf" promptText="Inf" HBox.hgrow="ALWAYS" />
+                                                                        <TextField fx:id="umbralMultiSup" promptText="Sup" HBox.hgrow="ALWAYS" />
+                                                                    </children>
+                                                                </HBox>
+                                                                <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#onMultiUmbralButtonClick" text="Aplicar Múltiple" />
+                                                            </children>
+                                                        </VBox>
+                                                    </children>
+                                                    <padding>
+                                                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                                    </padding>
+                                                </VBox>
+                                            </content>
+                                        </ScrollPane>
+                                    </content>
+                                </Tab>
+
+                                <Tab text="Filtros">
+                                    <content>
+                                        <ScrollPane fitToWidth="true" style="-fx-background: #3c3f41; -fx-background-color: transparent;">
+                                            <content>
+                                                <VBox spacing="10.0" style="-fx-background-color: #3c3f41;">
+                                                    <children>
+                                                        <Label text="Filtros Básicos" textFill="WHITE">
+                                                            <font>
+                                                                <Font name="System Bold" size="12.0" />
+                                                            </font>
+                                                        </Label>
+
+                                                        <VBox spacing="5.0" style="-fx-background-color: #313335; -fx-background-radius: 5; -fx-padding: 8;">
+                                                            <children>
+                                                                <HBox alignment="CENTER_LEFT" spacing="5.0">
+                                                                    <children>
+                                                                        <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#onMeanButtonClick" text="Promedio" HBox.hgrow="ALWAYS" />
+                                                                        <TextField fx:id="meanFilterH" alignment="CENTER" prefWidth="40.0" promptText="H" />
+                                                                        <Label text="x" textFill="WHITE" />
+                                                                        <TextField fx:id="meanFilterW" alignment="CENTER" prefWidth="40.0" promptText="W" />
+                                                                    </children>
+                                                                </HBox>
+                                                                <HBox alignment="CENTER_LEFT" spacing="5.0">
+                                                                    <children>
+                                                                        <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#onGaussButtonClick" text="Gauss" HBox.hgrow="ALWAYS" />
+                                                                        <TextField fx:id="gaussFilterSize" alignment="CENTER" prefWidth="50.0" promptText="Size" />
+                                                                    </children>
+                                                                </HBox>
+                                                                <HBox alignment="CENTER_LEFT" spacing="5.0">
+                                                                    <children>
+                                                                        <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#onMedianButtonClick" text="Mediana" HBox.hgrow="ALWAYS" />
+                                                                        <TextField fx:id="medianFilterSize" alignment="CENTER" prefWidth="50.0" promptText="Size" />
+                                                                    </children>
+                                                                </HBox>
+                                                            </children>
+                                                        </VBox>
+
+                                                        <Label text="Detectores de Borde" textFill="WHITE">
+                                                            <font>
+                                                                <Font name="System Bold" size="12.0" />
+                                                            </font>
+                                                        </Label>
+
+                                                        <VBox spacing="5.0" style="-fx-background-color: #313335; -fx-background-radius: 5; -fx-padding: 8;">
+                                                            <children>
+                                                                <HBox alignment="CENTER_LEFT" spacing="10.0">
+                                                                    <children>
+                                                                        <Button maxWidth="1.7976931348623157E308" onAction="#onApplySobelClick" text="Sobel" HBox.hgrow="ALWAYS" />
+                                                                        <RadioButton fx:id="radioXSobel" selected="true" text="X" textFill="WHITE">
+                                                                            <toggleGroup>
+                                                                                <ToggleGroup fx:id="orientationGroupSobel" />
+                                                                            </toggleGroup>
+                                                                        </RadioButton>
+                                                                        <RadioButton fx:id="radioYSobel" text="Y" textFill="WHITE" toggleGroup="$orientationGroupSobel" />
+                                                                    </children>
+                                                                </HBox>
+                                                                <HBox alignment="CENTER_LEFT" spacing="5.0">
+                                                                    <children>
+                                                                        <Label text="Kernel:" textFill="#aaaaaa" />
+                                                                        <Spinner fx:id="rowsSpinnerSobel" editable="true" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" />
+                                                                        <Label text="x" textFill="#aaaaaa" />
+                                                                        <Spinner fx:id="colsSpinnerSobel" editable="true" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" />
+                                                                    </children>
+                                                                </HBox>
+                                                            </children>
+                                                        </VBox>
+
+                                                        <VBox spacing="5.0" style="-fx-background-color: #313335; -fx-background-radius: 5; -fx-padding: 8;">
+                                                            <children>
+                                                                <HBox alignment="CENTER_LEFT" spacing="10.0">
+                                                                    <children>
+                                                                        <Button maxWidth="1.7976931348623157E308" onAction="#onApplyPrewittClick" text="Prewitt" HBox.hgrow="ALWAYS" />
+                                                                        <RadioButton fx:id="radioXPrewitt" selected="true" text="X" textFill="WHITE">
+                                                                            <toggleGroup>
+                                                                                <ToggleGroup fx:id="orientationGroupPrewitt" />
+                                                                            </toggleGroup>
+                                                                        </RadioButton>
+                                                                        <RadioButton fx:id="radioYPrewitt" text="Y" textFill="WHITE" toggleGroup="$orientationGroupPrewitt" />
+                                                                    </children>
+                                                                </HBox>
+                                                                <HBox alignment="CENTER_LEFT" spacing="5.0">
+                                                                    <children>
+                                                                        <Label text="Kernel:" textFill="#aaaaaa" />
+                                                                        <Spinner fx:id="rowsSpinnerPrewitt" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" />
+                                                                        <Label text="x" textFill="#aaaaaa" />
+                                                                        <Spinner fx:id="colsSpinnerPrewitt" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" />
+                                                                    </children>
+                                                                </HBox>
+                                                            </children>
+                                                        </VBox>
+
+                                                        <VBox spacing="5.0" style="-fx-background-color: #313335; -fx-background-radius: 5; -fx-padding: 8;">
+                                                            <children>
+                                                                <HBox alignment="CENTER_LEFT" spacing="10.0">
+                                                                    <children>
+                                                                        <Button maxWidth="1.7976931348623157E308" onAction="#onApplyRobertsClick" text="Roberts" HBox.hgrow="ALWAYS" />
+                                                                        <RadioButton fx:id="radioXRoberts" selected="true" text="X" textFill="WHITE">
+                                                                            <toggleGroup>
+                                                                                <ToggleGroup fx:id="orientationGroupRoberts" />
+                                                                            </toggleGroup>
+                                                                        </RadioButton>
+                                                                        <RadioButton fx:id="radioYRoberts" text="Y" textFill="WHITE" toggleGroup="$orientationGroupRoberts" />
+                                                                    </children>
+                                                                </HBox>
+                                                            </children>
+                                                        </VBox>
+
+                                                        <Separator opacity="0.3" prefWidth="200.0" />
+                                                        <Label text="Otros Operadores" textFill="WHITE">
+                                                            <font>
+                                                                <Font name="System Bold" size="12.0" />
+                                                            </font>
+                                                        </Label>
+
+                                                        <GridPane hgap="5.0" vgap="5.0">
+                                                            <columnConstraints>
+                                                                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                                                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                                            </columnConstraints>
+                                                            <rowConstraints>
+                                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                            </rowConstraints>
+                                                            <children>
+                                                                <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#onPerfilado4Click" text="Perfil 4" />
+                                                                <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#onPerfilado8Click" text="Perfil 8" GridPane.columnIndex="1" />
+                                                                <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#onApplyGradientClick" text="Gradiente" GridPane.rowIndex="1" />
+                                                                <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#onCustomKernelButtonClick" text="Custom Kernel" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                                                            </children>
+                                                        </GridPane>
+                                                    </children>
+                                                    <padding>
+                                                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                                    </padding>
+                                                </VBox>
+                                            </content>
+                                        </ScrollPane>
+                                    </content>
+                                </Tab>
+                            </tabs>
+                        </TabPane>
+                    </children>
+                </VBox>
+
+                <ScrollPane fitToHeight="true" fitToWidth="true" pannable="true" style="-fx-background-color: #1e1e1e;" HBox.hgrow="ALWAYS">
+                    <content>
+                        <StackPane style="-fx-background-color: #1e1e1e;">
+                            <children>
+                                <ImageView fx:id="mainImageView" pickOnBounds="true" preserveRatio="true" smooth="false" />
+                                <ImageView fx:id="mainImageView1" pickOnBounds="true" preserveRatio="true" smooth="false" />
+                            </children>
+                        </StackPane>
+                    </content>
+                </ScrollPane>
+
+                <VBox prefHeight="548.0" prefWidth="240.0" style="-fx-background-color: #313335; -fx-border-color: #1e1e1e; -fx-border-width: 0 0 0 1;">
+                    <children>
+                        <VBox spacing="5.0" style="-fx-background-color: #3c3f41; -fx-padding: 10;">
+                            <children>
+                                <Label text="Propiedades de Imagen" textFill="#bbbbbb">
+                                    <font>
+                                        <Font name="System Bold" size="12.0" />
+                                    </font>
+                                </Label>
+                                <Label fx:id="dimImage" text="Dimensiones: -" textFill="WHITE">
+                                    <font>
+                                        <Font name="Arial Italic" size="13.0" />
+                                    </font>
+                                </Label>
+                                <Label fx:id="colorsImage" text="#Colores: -" textFill="WHITE">
+                                    <font>
+                                        <Font name="Arial Italic" size="13.0" />
+                                    </font>
+                                </Label>
+                                <Label fx:id="bppImage" text="Bpp: -" textFill="WHITE">
+                                    <font>
+                                        <Font name="Arial Italic" size="13.0" />
+                                    </font>
+                                </Label>
+                            </children>
+                            <padding>
+                                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                            </padding>
+                        </VBox>
+
+                        <Accordion fx:id="rightAccordion" style="-fx-background-color: #313335;" VBox.vgrow="ALWAYS">
+                            <panes>
+                                <TitledPane animated="false" expanded="false" text="Perfil de Línea">
+                                    <content>
+                                        <VBox spacing="10.0" style="-fx-background-color: #3c3f41;">
+                                            <children>
+                                                <AreaChart fx:id="perfilAreaChart" animated="false" createSymbols="false" legendSide="TOP" prefHeight="200.0" title="Intensidad">
+                                                    <xAxis>
+                                                        <NumberAxis animated="false" autoRanging="true" label="X" side="BOTTOM" tickLabelFill="WHITE" />
+                                                    </xAxis>
+                                                    <yAxis>
+                                                        <NumberAxis animated="false" label="Valor" side="LEFT" tickLabelFill="WHITE" upperBound="255.0" />
+                                                    </yAxis>
+                                                </AreaChart>
+                                                <HBox alignment="CENTER" spacing="15.0">
+                                                    <children>
+                                                        <RadioButton mnemonicParsing="false" onAction="#onRadioPerfilClick" selected="true" text="R" textFill="WHITE">
+                                                            <toggleGroup>
+                                                                <ToggleGroup fx:id="imagePerfil" />
+                                                            </toggleGroup>
+                                                        </RadioButton>
+                                                        <RadioButton mnemonicParsing="false" onAction="#onRadioPerfilClick" text="G" textFill="WHITE" toggleGroup="$imagePerfil" />
+                                                        <RadioButton mnemonicParsing="false" onAction="#onRadioPerfilClick" text="B" textFill="WHITE" toggleGroup="$imagePerfil" />
+                                                    </children>
+                                                </HBox>
+                                                <HBox spacing="5.0">
+                                                    <children>
+                                                        <TextField fx:id="perfilText" promptText="Fila" HBox.hgrow="ALWAYS" />
+                                                        <Button mnemonicParsing="false" onAction="#onPerfilButtonClick" text="Cargar" />
+                                                    </children>
+                                                </HBox>
+                                            </children>
+                                        </VBox>
+                                    </content>
+                                </TitledPane>
+                                <TitledPane fx:id="dataPanel" animated="false" expanded="true" text="Análisis">
+                                    <content>
+                                        <AnchorPane minHeight="0.0" minWidth="0.0" style="-fx-background-color: #3c3f41;">
+                                            <children>
+                                                <TabPane style="-fx-background-color: #3c3f41;" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                                    <tabs>
+                                                        <Tab text="Histograma">
+                                                            <content>
+                                                                <VBox alignment="TOP_CENTER" maxHeight="300.0" spacing="5.0">
+                                                                    <children>
+                                                                        <AreaChart fx:id="histogramChart" animated="false" createSymbols="false" legendVisible="false" verticalGridLinesVisible="false" verticalZeroLineVisible="false" VBox.vgrow="ALWAYS">
+                                                                            <xAxis>
+                                                                                <NumberAxis autoRanging="false" label="0-255" side="BOTTOM" tickLabelFill="WHITE" upperBound="255" />
+                                                                            </xAxis>
+                                                                            <yAxis>
+                                                                                <NumberAxis label="Freq" side="LEFT" tickLabelFill="WHITE" />
+                                                                            </yAxis>
+                                                                        </AreaChart>
+                                                                        <HBox alignment="CENTER" spacing="15.0">
+                                                                            <children>
+                                                                                <RadioButton mnemonicParsing="false" onAction="#onRadioHistogramClick" selected="true" text="R" textFill="WHITE">
+                                                                                    <toggleGroup>
+                                                                                        <ToggleGroup fx:id="histogram" />
+                                                                                    </toggleGroup>
+                                                                                </RadioButton>
+                                                                                <RadioButton mnemonicParsing="false" onAction="#onRadioHistogramClick" text="G" textFill="WHITE" toggleGroup="$histogram" />
+                                                                                <RadioButton mnemonicParsing="false" onAction="#onRadioHistogramClick" text="B" textFill="WHITE" toggleGroup="$histogram" />
+                                                                            </children>
+                                                                            <padding>
+                                                                                <Insets bottom="5.0" />
+                                                                            </padding>
+                                                                        </HBox>
+                                                                    </children>
+                                                                </VBox>
+                                                            </content>
+                                                        </Tab>
+                                                        <Tab text="Curva">
+                                                            <content>
+                                                                <VBox alignment="TOP_CENTER" maxHeight="300.0" spacing="5.0">
+                                                                    <children>
+                                                                        <LineChart fx:id="toneCurveChart" animated="false" createSymbols="false" legendVisible="false" verticalGridLinesVisible="false" VBox.vgrow="ALWAYS">
+                                                                            <xAxis>
+                                                                                <NumberAxis autoRanging="false" label="In" side="BOTTOM" tickLabelFill="WHITE" tickUnit="50" upperBound="255" />
+                                                                            </xAxis>
+                                                                            <yAxis>
+                                                                                <NumberAxis autoRanging="false" label="Out" side="LEFT" tickLabelFill="WHITE" tickUnit="50" upperBound="255" />
+                                                                            </yAxis>
+                                                                        </LineChart>
+                                                                        <HBox alignment="CENTER" spacing="15.0">
+                                                                            <children>
+                                                                                <RadioButton mnemonicParsing="false" onAction="#onRadioCurveClick" selected="true" text="R" textFill="WHITE">
+                                                                                    <toggleGroup>
+                                                                                        <ToggleGroup fx:id="tonalCurve" />
+                                                                                    </toggleGroup>
+                                                                                </RadioButton>
+                                                                                <RadioButton mnemonicParsing="false" onAction="#onRadioCurveClick" text="G" textFill="WHITE" toggleGroup="$tonalCurve" />
+                                                                                <RadioButton mnemonicParsing="false" onAction="#onRadioCurveClick" text="B" textFill="WHITE" toggleGroup="$tonalCurve" />
+                                                                            </children>
+                                                                            <padding>
+                                                                                <Insets bottom="5.0" />
+                                                                            </padding>
+                                                                        </HBox>
+                                                                    </children>
+                                                                </VBox>
+                                                            </content>
+                                                        </Tab>
+                                                    </tabs>
+                                                </TabPane>
+                                            </children>
+                                        </AnchorPane>
+                                    </content>
+                                </TitledPane>
+                            </panes>
+                        </Accordion>
+                    </children>
+                </VBox>
+            </children>
+        </HBox>
+
+        <HBox alignment="CENTER_LEFT" prefHeight="25.0" style="-fx-background-color: #007acc; -fx-padding: 3;">
+            <children>
+                <Label fx:id="applicationConsole" text="Listo" textFill="WHITE">
+                    <font>
+                        <Font name="System Bold" size="11.0" />
+                    </font>
+                    <HBox.margin>
+                        <Insets left="5.0" />
+                    </HBox.margin>
+                </Label>
+            </children>
+        </HBox>
+    </children>
+</VBox>
