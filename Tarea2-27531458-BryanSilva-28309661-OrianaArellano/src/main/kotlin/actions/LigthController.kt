@@ -1,32 +1,24 @@
 package actions
 
 import models.ImageMatrix
+import org.opencv.core.Core
+import org.opencv.core.Scalar
 
 class LigthController {
     //Cambio de Brillo
     fun brightness(imageMatrix: ImageMatrix, change: Number): ImageMatrix {
-        val width = imageMatrix.width
-        val height = imageMatrix.height
-        for (y in 0 until height) {
-            for (x in 0 until width) {
-                imageMatrix.pixels[y][x].r = (imageMatrix.pixels[y][x].r + change.toInt()).coerceIn(0, 255)
-                imageMatrix.pixels[y][x].g = (imageMatrix.pixels[y][x].g + change.toInt()).coerceIn(0, 255)
-                imageMatrix.pixels[y][x].b = (imageMatrix.pixels[y][x].b + change.toInt()).coerceIn(0, 255)
-            }
-        }
-        return imageMatrix
+        val newImage = imageMatrix.copy()
+        val realChange = change.toDouble()
+        val scalar = Scalar(realChange, realChange, realChange, 0.0)
+        Core.add(imageMatrix.image, scalar, newImage.image)
+        return newImage
     }
     //Cambio de Contraste
     fun contrast(imageMatrix: ImageMatrix, change: Number): ImageMatrix {
-        val width = imageMatrix.width
-        val height = imageMatrix.height
-        for (y in 0 until height) {
-            for (x in 0 until width) {
-                imageMatrix.pixels[y][x].r = (((imageMatrix.pixels[y][x].r - 128) * change.toDouble()) + 128).coerceIn(0.0, 255.0).toInt()
-                imageMatrix.pixels[y][x].g = (((imageMatrix.pixels[y][x].g - 128) * change.toDouble()) + 128).coerceIn(0.0, 255.0).toInt()
-                imageMatrix.pixels[y][x].b = (((imageMatrix.pixels[y][x].b - 128) * change.toDouble()) + 128).coerceIn(0.0, 255.0).toInt()
-            }
-        }
-        return imageMatrix
+        val newImage = imageMatrix.copy()
+        val realChange = change.toDouble()
+        val scalar = Scalar(realChange, realChange, realChange, 0.0)
+        Core.multiply(imageMatrix.image, scalar, newImage.image)
+        return newImage
     }
 }

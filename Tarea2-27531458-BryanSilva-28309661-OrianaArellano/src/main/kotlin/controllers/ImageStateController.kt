@@ -57,21 +57,21 @@ class ImageStateController {
             dataLabel.text = "Imagen Invalida"
             return null
         }
-        dataLabel.text = "Imagen Cargada... ${file.name}"
         undoStack.clear()
         redoStack.clear()
         val matrixImage =  ImageMatrix(file)
         matrixImageOriginal = matrixImage.copy()
         changeView(matrixImage)
+        dataLabel.text = "Imagen Cargada... ${file.name}"
         return matrixImage
     }
     fun changeView(imageMatrix: ImageMatrix){
         imageView.image = imageMatrix.matrixToImage()
         //Crear primeros gráficos
-        chartController.updateHistogram(imageMatrix, "R")
-        chartController.updateCurve(matrixImageOriginal,imageMatrix, "R")
+       //chartController.updateHistogram(imageMatrix, "R")
+        //chartController.updateCurve(matrixImageOriginal,imageMatrix, "R")
         //Crear la información Inicial
-        dataController.update(imageMatrix)
+        //dataController.update(imageMatrix)
     }
     fun changeOriginalRotatedOrZoom(imageMatrix: ImageMatrix){
         matrixImageOriginal = imageMatrix.copy()
@@ -110,7 +110,7 @@ class ImageStateController {
         fileChooser.apply {
             initialDirectory = File(System.getProperty("user.dir")+"/imagesTest")
         }
-        when (imageMatrix.header) {
+        /*when (imageMatrix.header) {
             "P1" -> fileChooser.extensionFilters.add(FileChooser.ExtensionFilter("NetPBM Bitmap (P1)", "*.pbm"))
             "P2" -> fileChooser.extensionFilters.add(FileChooser.ExtensionFilter("NetPBM Graymap (P2)", "*.pgm"))
             "P3", "PNG/BMP" -> fileChooser.extensionFilters.add(FileChooser.ExtensionFilter("NetPBM Pixmap (P3)", "*.ppm"))
@@ -126,7 +126,7 @@ class ImageStateController {
         } catch (e: Exception) {
             dataLabel.text = "Error al guardar: ${e.message}"
             e.printStackTrace()
-        }
+        }*/
     }
     fun downloadImagePNG(imageMatrix: ImageMatrix){
         val fileChooser = FileChooser()
@@ -138,7 +138,7 @@ class ImageStateController {
         fileChooser.extensionFilters.add(FileChooser.ExtensionFilter("PNG", "*.png"))
         val file = fileChooser.showSaveDialog(stage)?: return
         try {
-            saveAsStandardImage(imageMatrix, file)
+            //saveAsStandardImage(imageMatrix, file)
             dataLabel.text = "Guardado PNG exitoso: ${file.name}"
         } catch (e: Exception) {
             dataLabel.text = "Error al guardar: ${e.message}"
@@ -154,7 +154,7 @@ class ImageStateController {
         fileChooser.extensionFilters.add(FileChooser.ExtensionFilter("BMP", "*.bmp"))
         val file = fileChooser.showSaveDialog(stage)?: return
         try {
-            saveAsStandardImage(imageMatrix, file)
+            //saveAsStandardImage(imageMatrix, file)
             dataLabel.text = "Guardado BMP exitoso: ${file.name}"
         } catch (e: Exception) {
             dataLabel.text = "Error al guardar: ${e.message}"
@@ -169,13 +169,14 @@ class ImageStateController {
         }
         val file = fileChooser.showSaveDialog(stage) ?: return
         try {
-            saveAsRLE(imageMatrix, file)
+            //saveAsRLE(imageMatrix, file)
             dataLabel.text = "Guardado RLE exitoso: ${file.name}"
         } catch (e: Exception) {
             dataLabel.text = "Error al guardar RLE: ${e.message}"
             e.printStackTrace()
         }
     }
+    /*
     //Guardar como P1
     private fun saveAsPBM(matrix: ImageMatrix, file: File) {
         val writer = BufferedWriter(FileWriter(file))
@@ -315,5 +316,5 @@ class ImageStateController {
                 writer.write("$r $g $b $count\n")
             }
         }
-    }
+    }*/
 }

@@ -6,6 +6,7 @@
 <?import javafx.scene.chart.NumberAxis?>
 <?import javafx.scene.control.Accordion?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.ColorPicker?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Menu?>
@@ -32,7 +33,6 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<?import javafx.scene.control.CheckBox?>
 <VBox fx:id="basicView" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="700.0" prefWidth="1000.0" style="-fx-background-color: #2b2b2b;" stylesheets="@../styles.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.BasicViewController">
     <children>
         <MenuBar style="-fx-background-color: #3c3f41; -fx-base: #3c3f41;">
@@ -116,15 +116,16 @@
                                                             <content>
                                                                 <VBox spacing="10.0" style="-fx-background-color: #3c3f41;">
                                                                     <children>
-                                                                        <Label text="Rotación y Espejo" textFill="#bbbbbb">
+                                                                        <Label text="Movimiento" textFill="#bbbbbb">
                                                                             <font>
                                                                                 <Font name="System Bold" size="12.0" />
                                                                             </font>
                                                                         </Label>
                                                                         <GridPane hgap="5.0" vgap="5.0">
                                                                             <columnConstraints>
-                                                                                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                                                                                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                                                                <ColumnConstraints hgrow="SOMETIMES" percentWidth="33.3" />
+                                                                                <ColumnConstraints hgrow="SOMETIMES" percentWidth="33.3" />
+                                                                                <ColumnConstraints hgrow="SOMETIMES" percentWidth="33.3" />
                                                                             </columnConstraints>
                                                                             <rowConstraints>
                                                                                 <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
@@ -132,11 +133,19 @@
                                                                                 <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                                                                             </rowConstraints>
                                                                             <children>
-                                                                                <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#onRotation90Click" text="90°" />
-                                                                                <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#onRotation180Click" text="180°" GridPane.rowIndex="1" />
-                                                                                <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#onRotation270Click" text="270°" GridPane.rowIndex="2" />
-                                                                                <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#onMirrorHClick" text="Espejo H" GridPane.columnIndex="1" />
-                                                                                <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#onMirrorVClick" text="Espejo V" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                                                                                <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#onRotationClockClick" text="↶" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+                                                                                <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="↑" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+                                                                                <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#onRotationClockAntiClick" text="↷" GridPane.columnIndex="2" GridPane.rowIndex="0" />
+
+                                                                                <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="←" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+
+                                                                                <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#onRotation180Click" style="-fx-font-size: 10;" text="180°" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+
+                                                                                <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="→" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+
+                                                                                <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="↓" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                                                            <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#onMirrorVClick" text="MirrorV" GridPane.rowIndex="2" />
+                                                            <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#onMirrorHClick" text="MirrorH" GridPane.columnIndex="2" GridPane.rowIndex="2" />
                                                                             </children>
                                                                         </GridPane>
                                                                         <Separator opacity="0.3" prefWidth="200.0" />
@@ -363,7 +372,7 @@
                                                                 <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#onPerfilado8Click" text="Perfil 8" GridPane.columnIndex="1" />
                                                                 <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#onApplyGradientClick" text="Gradiente" GridPane.rowIndex="1" />
                                                                 <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#onCustomKernelButtonClick" text="Custom Kernel" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                                                                <CheckBox fx:id="chkShowDirection" text="Mostrar Ángulo del Gradiente" GridPane.rowIndex="2" GridPane.columnSpan="2" />
+                                                                <CheckBox fx:id="chkShowDirection" text="Mostrar Ángulo del Gradiente" GridPane.columnSpan="2" GridPane.rowIndex="2" />
                                                             </children>
                                                         </GridPane>
                                                     </children>

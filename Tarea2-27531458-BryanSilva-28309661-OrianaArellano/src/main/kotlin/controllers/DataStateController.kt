@@ -22,7 +22,7 @@ class DataStateController {
     fun update(imageMatrix: ImageMatrix?) {
         imageMatrix?: return
         //Setea las dimensiones
-        val width = imageMatrix.width
+        /*val width = imageMatrix.width
         val height = imageMatrix.height
         dimImage.text = "Dimensiones: ${imageMatrix.width} x ${imageMatrix.height}"
         //Setea la cantidad de colores unicos
@@ -42,6 +42,6 @@ class DataStateController {
             "PNG/BMP" -> 24
             else -> return
         }
-        bppImage.text = "Bpp: $bbp"
+        bppImage.text = "Bpp: $bbp"*/
     }
 }

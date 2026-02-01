@@ -31,6 +31,8 @@ import java.awt.Desktop
 import java.io.File
 import kotlin.math.roundToInt
 import javafx.scene.control.CheckBox
+import org.opencv.core.Core
+import org.opencv.core.Scalar
 
 class BasicViewController {
 
@@ -234,16 +236,14 @@ class BasicViewController {
         //Brillo en Tiempo Real
         lightSlider.valueProperty().addListener { _, _, newValue ->
             if (matrixImage != null) {
-                val previewImage = matrixImage!!.copy()
-                ligthController.brightness(previewImage, newValue.toDouble())
+                val previewImage = ligthController.brightness(matrixImage!!, newValue.toDouble())
                 mainImageView.image = previewImage.matrixToImage()
             }
         }
         //Contraste en Tiempo Real
         contrastSlider.valueProperty().addListener { _, _, newValue ->
             if (matrixImage != null) {
-                val previewImage = matrixImage!!.copy()
-                ligthController.contrast(previewImage, newValue.toDouble())
+                val previewImage = ligthController.contrast(matrixImage!!, newValue.toDouble())
                 mainImageView.image = previewImage.matrixToImage()
             }
         }
@@ -256,7 +256,7 @@ class BasicViewController {
     fun onUmbralButtonClick(event: ActionEvent){
         matrixImage?:return
         imageController.saveToHistory(matrixImage!!)
-        umbralizerController.simpleUmbral(matrixImage!!, umbralSlider.value)
+        matrixImage = umbralizerController.simpleUmbral(matrixImage!!, umbralSlider.value)
         imageController.changeView(matrixImage!!)
     }
     //Umbral Multiple
@@ -267,7 +267,7 @@ class BasicViewController {
     fun onMultiUmbralButtonClick(event: ActionEvent){
         matrixImage?:return
         imageController.saveToHistory(matrixImage!!)
-        umbralizerController.multiUmbral(matrixImage!!,
+        matrixImage =  umbralizerController.multiUmbral(matrixImage!!,
             umbralMultInf.text.toInt(),
             umbralMultiSup.text.toInt())
         imageController.changeView(matrixImage!!)
@@ -277,7 +277,7 @@ class BasicViewController {
     fun onNegativeButtonClick(event: ActionEvent) {
         matrixImage?:return
         imageController.saveToHistory(matrixImage!!)
-        tonoController.negativeImage(matrixImage!!)
+        matrixImage = tonoController.negativeImage(matrixImage!!)
         imageController.changeView(matrixImage!!)
     }
     //Escala de Grises
@@ -285,7 +285,7 @@ class BasicViewController {
     fun onGreyscaleButtonClick(event: ActionEvent) {
         matrixImage?:return
         imageController.saveToHistory(matrixImage!!)
-        tonoController.greyScale(matrixImage!!)
+        matrixImage = tonoController.greyScale(matrixImage!!)
         imageController.changeView(matrixImage!!)
     }
     //Escala de Color
@@ -294,8 +294,8 @@ class BasicViewController {
     @FXML
     fun onColorScalePickerClick(event: ActionEvent) {
         matrixImage?:return
-        imageController.saveToHistory(matrixImage!!)
-        tonoController.colorScale(matrixImage!!, colorScalePicker)
+        //imageController.saveToHistory(matrixImage!!)
+        matrixImage = tonoController.colorScale(matrixImage!!, colorScalePicker)
         imageController.changeView(matrixImage!!)
     }
     //Cambio de Brillo
@@ -304,8 +304,8 @@ class BasicViewController {
     @FXML
     fun onBrigthnessButtonClick(event: ActionEvent) {
         matrixImage?:return
-        imageController.saveToHistory(matrixImage!!)
-        ligthController.brightness(matrixImage!!, lightSlider.value)
+        //imageController.saveToHistory(matrixImage!!)
+        matrixImage = ligthController.brightness(matrixImage!!, lightSlider.value)
         imageController.changeView(matrixImage!!)
         lightSlider.value = 0.0
     }
@@ -315,8 +315,8 @@ class BasicViewController {
     @FXML
     fun onConstrastButtonClick(event: ActionEvent) {
         matrixImage?:return
-        imageController.saveToHistory(matrixImage!!)
-        ligthController.contrast(matrixImage!!, contrastSlider.value)
+        //imageController.saveToHistory(matrixImage!!)
+        matrixImage = ligthController.contrast(matrixImage!!, contrastSlider.value)
         imageController.changeView(matrixImage!!)
         contrastSlider.value = 1.0
     }
@@ -340,14 +340,24 @@ class BasicViewController {
         matrixImage = rotationController.mirrorV(matrixImage!!)
         imageController.changeView(matrixImage!!)
     }
-    //Rotacion 90 grados
+    //Rotacion Clockwise
     @FXML
-    fun onRotation90Click(event: ActionEvent) {
+    fun onRotationClockClick(event: ActionEvent) {
         matrixImage?:return
-        originalGeometryImage = rotationController.rotation90(originalGeometryImage!!)
+        originalGeometryImage = rotationController.rotation(originalGeometryImage!!, 5.0)
         imageController.changeOriginalRotatedOrZoom(originalGeometryImage!!)
         imageController.saveToHistory(matrixImage!!)
-        matrixImage = rotationController.rotation90(matrixImage!!)
+        matrixImage = rotationController.rotation(matrixImage!!, 5.0)
+        imageController.changeView(matrixImage!!)
+    }
+    //Rotacion AntiClockwise
+    @FXML
+    fun onRotationClockAntiClick(event: ActionEvent) {
+        matrixImage?:return
+        originalGeometryImage = rotationController.rotation(originalGeometryImage!!, -5.0)
+        imageController.changeOriginalRotatedOrZoom(originalGeometryImage!!)
+        imageController.saveToHistory(matrixImage!!)
+        matrixImage = rotationController.rotation(matrixImage!!, -5.0)
         imageController.changeView(matrixImage!!)
     }
     //Rotacion 180 grados
@@ -358,16 +368,6 @@ class BasicViewController {
         imageController.changeOriginalRotatedOrZoom(originalGeometryImage!!)
         imageController.saveToHistory(matrixImage!!)
         matrixImage = rotationController.rotation180(matrixImage!!)
-        imageController.changeView(matrixImage!!)
-    }
-    //Rotacion 270 grados
-    @FXML
-    fun onRotation270Click(event: ActionEvent) {
-        matrixImage?:return
-        originalGeometryImage = rotationController.rotation270(originalGeometryImage!!)
-        imageController.changeOriginalRotatedOrZoom(originalGeometryImage!!)
-        imageController.saveToHistory(matrixImage!!)
-        matrixImage = rotationController.rotation270(matrixImage!!)
         imageController.changeView(matrixImage!!)
     }
     //Zoom In
@@ -491,7 +491,7 @@ class BasicViewController {
 
     private fun aplicarPerfilado(kernel: Kernel) {
         matrixImage?:return
-        val convolutionController = ConvolutionController()
+        /*val convolutionController = ConvolutionController()
         val laplacianImage = convolutionController.apply(matrixImage!!, kernel)
         val width = matrixImage!!.width
         val height = matrixImage!!.height
@@ -513,7 +513,7 @@ class BasicViewController {
             }
         }
         matrixImage = newImage
-        imageController.changeView(matrixImage!!)
+        imageController.changeView(matrixImage!!)*/
     }
 
     @FXML
@@ -657,8 +657,8 @@ class BasicViewController {
         imageController.changeView(matrixImage!!)
     }
 
-    fun combineGradient(gx: ImageMatrix, gy: ImageMatrix): ImageMatrix {
-        val result = ImageMatrix(width = gx.width, height = gx.height)
+    fun combineGradient(gx: ImageMatrix, gy: ImageMatrix): ImageMatrix? {
+        /*val result = ImageMatrix(width = gx.width, height = gx.height)
         for (y in 0 until gx.height) {
             for (x in 0 until gx.width) {
                 val valueX = gx[y, x]
@@ -666,12 +666,12 @@ class BasicViewController {
                 val magnitude = kotlin.math.sqrt(valueX * valueX + valueY * valueY)
                 result[y, x] = magnitude
             }
-        }
-        return result
+        }*/
+        return null
     }
 
-    fun calculateAngles(gx: ImageMatrix, gy: ImageMatrix): ImageMatrix {
-        val result = ImageMatrix(width = gx.width, height = gx.height)
+    fun calculateAngles(gx: ImageMatrix, gy: ImageMatrix): ImageMatrix? {
+        /*val result = ImageMatrix(width = gx.width, height = gx.height)
 
         for (y in 0 until gx.height) {
             for (x in 0 until gx.width) {
@@ -683,8 +683,8 @@ class BasicViewController {
 
                 result[y, x] = normalized
             }
-        }
-        return result
+        }*/
+        return null
     }
 
 }

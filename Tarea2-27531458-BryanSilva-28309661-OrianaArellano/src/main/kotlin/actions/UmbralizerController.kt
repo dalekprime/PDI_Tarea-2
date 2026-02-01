@@ -2,39 +2,45 @@ package actions
 
 import models.ImageMatrix
 import models.Pixel
+import org.opencv.core.Core
+import org.opencv.core.Mat
+import org.opencv.core.Scalar
+import org.opencv.imgproc.Imgproc
 
 class UmbralizerController {
     //Umbral Simple
     fun simpleUmbral(imageMatrix: ImageMatrix, threshold: Number): ImageMatrix {
-        val width = imageMatrix.width
-        val height = imageMatrix.height
-        for (y in 0 until height) {
-            for (x in 0 until width) {
-                val grey = (0.299*imageMatrix.pixels[y][x].r + 0.587*imageMatrix.pixels[y][x].g + 0.114*imageMatrix.pixels[y][x].b)
-                val ele = if (grey < threshold.toInt()) 0 else 255
-                imageMatrix.pixels[y][x] = Pixel(ele, ele, ele)
-            }
+        val t = threshold.toDouble()
+        val grayMat = Mat()
+        if (imageMatrix.image.channels() == 4) {
+            Imgproc.cvtColor(imageMatrix.image, grayMat, Imgproc.COLOR_BGRA2GRAY)
+        } else {
+            Imgproc.cvtColor(imageMatrix.image, grayMat, Imgproc.COLOR_BGR2GRAY)
         }
-        imageMatrix.header = "P1"
-        return imageMatrix
+        val binaryMat = Mat()
+        Imgproc.threshold(grayMat, binaryMat, t, 255.0, Imgproc.THRESH_BINARY)
+        grayMat.release()
+        val resultMat = Mat()
+        Imgproc.cvtColor(binaryMat, resultMat, Imgproc.COLOR_GRAY2BGR)
+        binaryMat.release()
+        return ImageMatrix(resultMat)
     }
     //Umbral Multiple
     fun multiUmbral(imageMatrix: ImageMatrix, thresholdInf: Number, thresholdSup: Number): ImageMatrix {
-        val width = imageMatrix.width
-        val height = imageMatrix.height
-        val t1 = thresholdInf.toInt()
-        val t2 = thresholdSup.toInt()
-        for (y in 0 until height) {
-            for (x in 0 until width) {
-                val grey = (0.299*imageMatrix.pixels[y][x].r + 0.587*imageMatrix.pixels[y][x].g + 0.114*imageMatrix.pixels[y][x].b)
-                if (grey >= t1 && grey <= t2) {
-                    imageMatrix.pixels[y][x] = Pixel(255, 255, 255)
-                } else {
-                    imageMatrix.pixels[y][x] = Pixel(0, 0, 0)
-                }
-            }
+        val t1 = thresholdInf.toDouble()
+        val t2 = thresholdSup.toDouble()
+        val grayMat = Mat()
+        if (imageMatrix.image.channels() == 4) {
+            Imgproc.cvtColor(imageMatrix.image, grayMat, Imgproc.COLOR_BGRA2GRAY)
+        } else {
+            Imgproc.cvtColor(imageMatrix.image, grayMat, Imgproc.COLOR_BGR2GRAY)
         }
-        imageMatrix.header = "P1"
-        return imageMatrix
+        val binaryMat = Mat()
+        Core.inRange(grayMat, Scalar(t1), Scalar(t2), binaryMat)
+        grayMat.release()
+        val resultMat = Mat()
+        Imgproc.cvtColor(binaryMat, resultMat, Imgproc.COLOR_GRAY2BGR)
+        binaryMat.release()
+        return ImageMatrix(resultMat)
     }
 }

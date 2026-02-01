@@ -28,7 +28,7 @@ class ChartStateController {
     //Actualiza el Histograma
     fun updateHistogram(imageMatrix: ImageMatrix?, channel: String) {
         imageMatrix?:return
-        val getVal: (Int, Int) -> Int = when (channel) {
+        /*val getVal: (Int, Int) -> Int = when (channel) {
             "R" -> { y, x -> imageMatrix.pixels[y][x].r }
             "G" -> { y, x -> imageMatrix.pixels[y][x].g }
             "B" -> { y, x -> imageMatrix.pixels[y][x].b }
@@ -50,11 +50,11 @@ class ChartStateController {
         val series = XYChart.Series<Number, Number>()
         series.data.setAll(dataList)
         histogramChart.data.clear()
-        histogramChart.data.add(series)
+        histogramChart.data.add(series)*/
     }
     //Actualiza la Curva Tonal
     fun updateCurve(originalImage: ImageMatrix?, actualImage: ImageMatrix?, channel: String) {
-        originalImage ?: return
+        /*originalImage ?: return
         actualImage ?: return
         /*if (originalImage.width != actualImage.width || originalImage.height != actualImage.height) {
             toneCurveChart.data.clear()
@@ -96,11 +96,11 @@ class ChartStateController {
         val series = XYChart.Series<Number, Number>()
         series.data.setAll(dataList)
         toneCurveChart.data.clear()
-        toneCurveChart.data.add(series)
+        toneCurveChart.data.add(series)*/
     }
     //Actuliza el Perfil de la Imagen
     fun updatePerfil(imageMatrix: ImageMatrix?, line: Int, channel: String) {
-        imageMatrix?: return
+        /*imageMatrix?: return
         val width = imageMatrix.width
         if (line < 0 || line >= (imageMatrix.height)) {
             println("Error: La línea $line no existe")
@@ -118,6 +118,6 @@ class ChartStateController {
             series.data.add(XYChart.Data(x, color))
         }
         perfilerChart.data.clear()
-        perfilerChart.data.add(series)
+        perfilerChart.data.add(series)*/
     }
 }
