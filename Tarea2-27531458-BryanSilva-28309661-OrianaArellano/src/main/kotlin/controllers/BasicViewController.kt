@@ -30,6 +30,7 @@ import models.Pixel
 import java.awt.Desktop
 import java.io.File
 import kotlin.math.roundToInt
+import javafx.scene.control.CheckBox
 
 class BasicViewController {
 
@@ -606,6 +607,8 @@ class BasicViewController {
     lateinit var radioPrewitt: RadioButton
     @FXML
     lateinit var radioRoberts: RadioButton
+    @FXML
+    private lateinit var chkShowDirection: CheckBox
 
     @FXML
     fun onApplyGradientClick(event: ActionEvent) {
@@ -643,8 +646,14 @@ class BasicViewController {
                 return
             }
         }
-        val gradient = combineGradient(gx, gy)
-        matrixImage = gradient
+        val resultImage = if (chkShowDirection.isSelected) {
+            // Si el usuario quiere ver la dirección del borde
+            calculateAngles(gx, gy)
+        } else {
+            // Si el usuario quiere ver la fuerza del borde (Lo normal)
+            combineGradient(gx, gy)
+        }
+        matrixImage = resultImage
         imageController.changeView(matrixImage!!)
     }
 
@@ -656,6 +665,23 @@ class BasicViewController {
                 val valueY = gy[y, x]
                 val magnitude = kotlin.math.sqrt(valueX * valueX + valueY * valueY)
                 result[y, x] = magnitude
+            }
+        }
+        return result
+    }
+
+    fun calculateAngles(gx: ImageMatrix, gy: ImageMatrix): ImageMatrix {
+        val result = ImageMatrix(width = gx.width, height = gx.height)
+
+        for (y in 0 until gx.height) {
+            for (x in 0 until gx.width) {
+                val valueX = gx[y, x]
+                val valueY = gy[y, x]
+
+                val radians = kotlin.math.atan2(valueY, valueX)
+                val normalized = ((radians + Math.PI) / (2 * Math.PI)) * 255
+
+                result[y, x] = normalized
             }
         }
         return result

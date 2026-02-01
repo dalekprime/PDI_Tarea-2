@@ -32,6 +32,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
+<?import javafx.scene.control.CheckBox?>
 <VBox fx:id="basicView" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="700.0" prefWidth="1000.0" style="-fx-background-color: #2b2b2b;" stylesheets="@../styles.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.BasicViewController">
     <children>
         <MenuBar style="-fx-background-color: #3c3f41; -fx-base: #3c3f41;">
@@ -355,12 +356,14 @@
                                                             <rowConstraints>
                                                                 <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                                                                 <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                                                             </rowConstraints>
                                                             <children>
                                                                 <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#onPerfilado4Click" text="Perfil 4" />
                                                                 <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#onPerfilado8Click" text="Perfil 8" GridPane.columnIndex="1" />
                                                                 <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#onApplyGradientClick" text="Gradiente" GridPane.rowIndex="1" />
                                                                 <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#onCustomKernelButtonClick" text="Custom Kernel" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                                                                <CheckBox fx:id="chkShowDirection" text="Mostrar Ángulo del Gradiente" GridPane.rowIndex="2" GridPane.columnSpan="2" />
                                                             </children>
                                                         </GridPane>
                                                     </children>
