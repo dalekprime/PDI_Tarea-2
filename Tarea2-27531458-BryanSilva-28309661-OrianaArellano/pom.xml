@@ -93,6 +93,11 @@
             <version>26-ea+19</version>
             <type>pom</type>
         </dependency>
+        <dependency>
+            <groupId>org.openpnp</groupId>
+            <artifactId>opencv</artifactId>
+            <version>4.9.0-0</version>
+        </dependency>
     </dependencies>
 
 </project>
