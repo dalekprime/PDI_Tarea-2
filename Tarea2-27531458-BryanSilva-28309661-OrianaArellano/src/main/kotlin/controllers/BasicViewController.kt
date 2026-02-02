@@ -254,6 +254,13 @@ class BasicViewController {
                 mainImageView.image = previewImage.matrixToImage()
             }
         }
+        //Umbral Simple en Tiempo Real
+        umbralSlider.valueProperty().addListener { _, _, newValue ->
+            if (matrixImage != null) {
+                val previewImage = umbralizerController.simpleUmbral(matrixImage!!, umbralSlider.value)
+                mainImageView.image = previewImage.matrixToImage()
+            }
+        }
     }
 
     //Umbral Simple
