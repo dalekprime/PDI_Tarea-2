@@ -3,13 +3,14 @@ package models
 import javafx.scene.image.Image
 import javafx.scene.image.PixelFormat
 import javafx.scene.image.WritableImage
+import org.opencv.core.CvType
 import org.opencv.imgproc.Imgproc
-import java.io.BufferedReader
 import java.io.File
-import java.io.FileReader
-import java.io.StreamTokenizer
 import org.opencv.core.Mat
 import org.opencv.imgcodecs.Imgcodecs;
+import java.io.BufferedReader
+import java.io.FileReader
+import java.io.StreamTokenizer
 
 class ImageMatrix {
     var image: Mat
@@ -17,86 +18,96 @@ class ImageMatrix {
         image = content
     }
     constructor(file: File){
-        image = Imgcodecs.imread(file.absolutePath, Imgcodecs.IMREAD_UNCHANGED)
+        if (file.extension.equals("rle", ignoreCase = true)) {
+            image = loadFromRLE(file)
+        } else {
+            image = Imgcodecs.imread(file.absolutePath, Imgcodecs.IMREAD_UNCHANGED)
+        }
         if (image.empty()) {
             throw Exception("No se pudo cargar la imagen: ${file.absolutePath}")
         }
     }
-
-    /*private fun loadImageFromRLE(file: File){
-        val width = image.width()
-        val height = image.height()
+    private fun loadFromRLE(file: File): Mat {
         val reader = BufferedReader(FileReader(file))
         val tokenizer = StreamTokenizer(reader)
         tokenizer.commentChar('#'.code)
-
-        fun nextInt(): Int {
-            if (tokenizer.nextToken() == StreamTokenizer.TT_EOF)
-                throw Exception("Archivo incompleto")
-            return tokenizer.nval.toInt()
+        fun nextToken(): Int {
+            val token = tokenizer.nextToken()
+            if (token == StreamTokenizer.TT_EOF) throw Exception("Archivo incompleto (EOF inesperado)")
+            return token
         }
-
         fun nextString(): String {
-            if (tokenizer.nextToken() == StreamTokenizer.TT_EOF)
-                throw Exception("Archivo incompleto")
+            nextToken()
             return tokenizer.sval ?: ""
         }
-
-        val header = nextString()
-        if(header !in listOf("P1","P2","P3")){
-            throw Exception("Codificación RLE no soportada")
+        fun nextInt(): Int {
+            nextToken()
+            return tokenizer.nval.toInt()
         }
-        image.reshape(nextInt(), nextInt())
-
-        val matrix = Array(height) { Array(width) { Pixel(0,0,0) } }
-        var x = 0
-        var y = 0
-        var filled = 0
+        val header = nextString()
+        if (header !in listOf("P1", "P2", "P3")) {
+            reader.close()
+            throw Exception("Formato RLE no soportado: $header")
+        }
+        val width = nextInt()
+        val height = nextInt()
+        val maxVal = if (header != "P1") nextInt() else 1
         val totalPixels = width * height
-
-        while(filled < totalPixels){
-            when(header){
-                "P1" -> {
-                    val value = nextInt()
-                    val count = nextInt()
-                    val pixel = if (value == 0) Pixel(0, 0, 0) else Pixel(255, 255, 255)
-
-                    repeat(count){
-                        if (filled >= totalPixels) throw Exception("Archivo excede dimensiones declaradas")
-                        matrix[y][x] = pixel
-                        x++; filled++
-                        if (x >= width) { x = 0; y++ }
+        var filledPixels = 0
+        val channels = if (header == "P3") 3 else 1
+        val type = if (header == "P3") CvType.CV_8UC3 else CvType.CV_8UC1
+        val buffer = ByteArray(totalPixels * channels)
+        var bufferIdx = 0
+        try {
+            while (filledPixels < totalPixels) {
+                when (header) {
+                    "P1" -> {
+                        val value = nextInt()
+                        val count = nextInt()
+                        val pixelByte = (if (value == 0) 0 else 255).toByte()
+                        repeat(count) {
+                            if (bufferIdx < buffer.size) {
+                                buffer[bufferIdx++] = pixelByte
+                                filledPixels++
+                            }
+                        }
                     }
-                }
-                "P2" -> {
-                    val gray = nextInt()
-                    val count = nextInt()
-                    val pixelVal = (gray*255)/maxVal
-                    repeat(count){
-                        if(filled >= totalPixels) throw Exception("Archivo excede dimensiones declaradas")
-                        matrix[y][x] = Pixel(pixelVal,pixelVal,pixelVal)
-                        x++; filled++
-                        if(x >= width){ x = 0; y++ }
+                    "P2" -> {
+                        val gray = nextInt()
+                        val count = nextInt()
+                        val pixelVal = ((gray * 255) / maxVal).toByte()
+                        repeat(count) {
+                            if (bufferIdx < buffer.size) {
+                                buffer[bufferIdx++] = pixelVal
+                                filledPixels++
+                            }
+                        }
                     }
-                }
-                "P3" -> {
-                    val r = nextInt()
-                    val g = nextInt()
-                    val b = nextInt()
-                    val count = nextInt()
-                    repeat(count){
-                        if(filled >= totalPixels) throw Exception("Archivo excede dimensiones declaradas")
-                        matrix[y][x] = Pixel(r,g,b)
-                        x++; filled++
-                        if(x >= width){ x = 0; y++ }
+                    "P3" -> {
+                        val r = nextInt()
+                        val g = nextInt()
+                        val b = nextInt()
+                        val count = nextInt()
+                        repeat(count) {
+                            if (bufferIdx < buffer.size - 2) {
+                                buffer[bufferIdx++] = b.toByte()
+                                buffer[bufferIdx++] = g.toByte()
+                                buffer[bufferIdx++] = r.toByte()
+                                filledPixels++
+                            }
+                        }
                     }
                 }
             }
+        } catch (e: Exception) {
+            reader.close()
+            throw Exception("Error parseando datos RLE: ${e.message}")
         }
-
         reader.close()
-        pixels = matrix
-    }*/
+        val mat = Mat(height, width, type)
+        mat.put(0, 0, buffer)
+        return mat
+    }
     fun matrixToImage(): Image{
         val width = image.width()
         val height = image.height()

@@ -5,12 +5,11 @@ import javafx.scene.image.ImageView
 import javafx.stage.FileChooser
 import javafx.stage.Stage
 import models.ImageMatrix
-import java.awt.image.BufferedImage
+import org.opencv.imgcodecs.Imgcodecs
 import java.io.BufferedWriter
 import java.io.File
 import java.io.FileWriter
 import java.util.Stack
-import javax.imageio.ImageIO
 
 class ImageStateController {
     private val maxHistorySize = 5
@@ -68,10 +67,10 @@ class ImageStateController {
     fun changeView(imageMatrix: ImageMatrix){
         imageView.image = imageMatrix.matrixToImage()
         //Crear primeros gráficos
-       //chartController.updateHistogram(imageMatrix, "R")
-        //chartController.updateCurve(matrixImageOriginal,imageMatrix, "R")
+        chartController.updateHistogram(imageMatrix, "R")
+        chartController.updateCurve(matrixImageOriginal,imageMatrix, "R")
         //Crear la información Inicial
-        //dataController.update(imageMatrix)
+        dataController.update(imageMatrix)
     }
     fun changeOriginalRotatedOrZoom(imageMatrix: ImageMatrix){
         matrixImageOriginal = imageMatrix.copy()
@@ -105,57 +104,44 @@ class ImageStateController {
     }
     fun downloadImageNetpbm(imageMatrix: ImageMatrix){
         val fileChooser = FileChooser()
-        fileChooser.title = "Guardar Imagen"
+        fileChooser.title = "Guardar Imagen NetPBM"
         fileChooser.initialFileName = "imagen_editada"
-        fileChooser.apply {
-            initialDirectory = File(System.getProperty("user.dir")+"/imagesTest")
+        fileChooser.initialDirectory = File(System.getProperty("user.dir") + "/imagesTest")
+        val channels = imageMatrix.image.channels()
+        if (channels == 1) {
+            fileChooser.extensionFilters.add(FileChooser.ExtensionFilter("NetPBM Graymap (P2)", "*.pgm"))
+            fileChooser.extensionFilters.add(FileChooser.ExtensionFilter("NetPBM Bitmap (P1)", "*.pbm"))
+        } else {
+            fileChooser.extensionFilters.add(FileChooser.ExtensionFilter("NetPBM Pixmap (P3)", "*.ppm"))
         }
-        /*when (imageMatrix.header) {
-            "P1" -> fileChooser.extensionFilters.add(FileChooser.ExtensionFilter("NetPBM Bitmap (P1)", "*.pbm"))
-            "P2" -> fileChooser.extensionFilters.add(FileChooser.ExtensionFilter("NetPBM Graymap (P2)", "*.pgm"))
-            "P3", "PNG/BMP" -> fileChooser.extensionFilters.add(FileChooser.ExtensionFilter("NetPBM Pixmap (P3)", "*.ppm"))
-        }
-        val file = fileChooser.showSaveDialog(stage)?: return
+        val file = fileChooser.showSaveDialog(stage) ?: return
         try {
-            when (imageMatrix.header) {
-                "P1" -> saveAsPBM(imageMatrix, file)
-                "P2" -> saveAsPGM(imageMatrix, file)
-                "P3", "PNG/BMP" -> saveAsPPM(imageMatrix, file)
+            val ext = file.extension.lowercase()
+            when {
+                ext == "pbm" -> saveAsPBM(imageMatrix, file)
+                ext == "pgm" -> saveAsPGM(imageMatrix, file)
+                ext == "ppm" -> saveAsPPM(imageMatrix, file)
+                else -> saveAsPPM(imageMatrix, file) // Default
             }
             dataLabel.text = "Guardado NetPBM exitoso: ${file.name}"
         } catch (e: Exception) {
             dataLabel.text = "Error al guardar: ${e.message}"
             e.printStackTrace()
-        }*/
-    }
-    fun downloadImagePNG(imageMatrix: ImageMatrix){
-        val fileChooser = FileChooser()
-        fileChooser.title = "Guardar Imagen"
-        fileChooser.initialFileName = "imagen_editada"
-        fileChooser.apply {
-            initialDirectory = File(System.getProperty("user.dir")+"/imagesTest")
-        }
-        fileChooser.extensionFilters.add(FileChooser.ExtensionFilter("PNG", "*.png"))
-        val file = fileChooser.showSaveDialog(stage)?: return
-        try {
-            //saveAsStandardImage(imageMatrix, file)
-            dataLabel.text = "Guardado PNG exitoso: ${file.name}"
-        } catch (e: Exception) {
-            dataLabel.text = "Error al guardar: ${e.message}"
         }
     }
-    fun downloadImagebmp(imageMatrix: ImageMatrix){
+    fun downloadImagePNG(imageMatrix: ImageMatrix) = saveStandard(imageMatrix, "png")
+    fun downloadImagebmp(imageMatrix: ImageMatrix) = saveStandard(imageMatrix, "bmp")
+    private fun saveStandard(imageMatrix: ImageMatrix, ext: String) {
         val fileChooser = FileChooser()
-        fileChooser.title = "Guardar Imagen"
-        fileChooser.initialFileName = "imagen_editada"
-        fileChooser.apply {
-            initialDirectory = File(System.getProperty("user.dir")+"/imagesTest")
-        }
-        fileChooser.extensionFilters.add(FileChooser.ExtensionFilter("BMP", "*.bmp"))
-        val file = fileChooser.showSaveDialog(stage)?: return
+        fileChooser.title = "Guardar Imagen $ext"
+        fileChooser.initialFileName = "imagen_editada.$ext"
+        fileChooser.initialDirectory = File(System.getProperty("user.dir") + "/imagesTest")
+        fileChooser.extensionFilters.add(FileChooser.ExtensionFilter(ext.uppercase(), "*.$ext"))
+        val file = fileChooser.showSaveDialog(stage) ?: return
         try {
-            //saveAsStandardImage(imageMatrix, file)
-            dataLabel.text = "Guardado BMP exitoso: ${file.name}"
+            val success = Imgcodecs.imwrite(file.absolutePath, imageMatrix.image)
+            if (success) dataLabel.text = "Guardado $ext exitoso: ${file.name}"
+            else dataLabel.text = "Error interno de OpenCV al guardar"
         } catch (e: Exception) {
             dataLabel.text = "Error al guardar: ${e.message}"
         }
@@ -165,139 +151,141 @@ class ImageStateController {
             title = "Guardar comprimido RLE"
             initialFileName = "imagen_comprimida.rle"
             extensionFilters.add(FileChooser.ExtensionFilter("Run Length Encoding", "*.rle"))
-            initialDirectory = File(System.getProperty("user.dir")+"/imagesTest")
+            initialDirectory = File(System.getProperty("user.dir") + "/imagesTest")
         }
         val file = fileChooser.showSaveDialog(stage) ?: return
         try {
-            //saveAsRLE(imageMatrix, file)
+            saveAsRLE(imageMatrix, file)
             dataLabel.text = "Guardado RLE exitoso: ${file.name}"
         } catch (e: Exception) {
             dataLabel.text = "Error al guardar RLE: ${e.message}"
             e.printStackTrace()
         }
     }
-    /*
-    //Guardar como P1
     private fun saveAsPBM(matrix: ImageMatrix, file: File) {
+        val mat = matrix.image
+        val width = mat.cols()
+        val height = mat.rows()
+        val buffer = ByteArray(width * height * mat.channels())
+        mat.get(0, 0, buffer)
         val writer = BufferedWriter(FileWriter(file))
         writer.write("P1\n")
-        writer.write("# Creado por ImageEditor\n")
-        writer.write("${matrix.width} ${matrix.height}\n")
-        for (y in 0 until matrix.height) {
-            for (x in 0 until matrix.width) {
-                val p = matrix.pixels[y][x]
-                val value = if (p.r > 127) "0" else "1"
-                writer.write("$value ")
-            }
-            writer.write("\n")
-        }
-        writer.close()
-    }
-    //Guardar como P2
-    private fun saveAsPGM(matrix: ImageMatrix, file: File) {
-        val writer = BufferedWriter(FileWriter(file))
-        // Header P2
-        writer.write("P2\n")
-        writer.write("# Creado por ImageEditor\n")
-        writer.write("${matrix.width} ${matrix.height}\n")
-        writer.write("${matrix.maxVal}\n")
-        for (y in 0 until matrix.height) {
-            for (x in 0 until matrix.width) {
-                val p = matrix.pixels[y][x]
-                val gray = p.r
-                writer.write("$gray ")
-            }
-            writer.write("\n")
-        }
-        writer.close()
-    }
-    //Guardar como P3
-    private fun saveAsPPM(matrix: ImageMatrix, file: File) {
-        val writer = BufferedWriter(FileWriter(file))
-        writer.write("P3\n")
-        writer.write("# Creado por ImageEditor\n")
-        writer.write("${matrix.width} ${matrix.height}\n")
-        writer.write("255\n") // Asumimos 255 siempre para exportación estándar
-        for (y in 0 until matrix.height) {
-            for (x in 0 until matrix.width) {
-                val p = matrix.pixels[y][x]
-                writer.write("${p.r} ${p.g} ${p.b}  ")
-            }
-            writer.write("\n")
-        }
-        writer.close()
-    }
-    //Guardar como PNG o BMP
-    private fun saveAsStandardImage(matrix: ImageMatrix, file: File) {
-        val width = matrix.width
-        val height = matrix.height
-        val bufferedImage = BufferedImage(width, height, BufferedImage.TYPE_INT_RGB)
+        writer.write("# Creado por ImageEditor (OpenCV)\n")
+        writer.write("$width $height\n")
+        var idx = 0
+        val step = mat.channels()
         for (y in 0 until height) {
             for (x in 0 until width) {
-                val p = matrix.pixels[y][x]
-                val rgb = (p.r shl 16) or (p.g shl 8) or p.b
-                bufferedImage.setRGB(x, y, rgb)
+                val grayVal = buffer[idx].toInt() and 0xFF
+                val bit = if (grayVal > 127) "0" else "1"
+                writer.write("$bit ")
+                idx += step
             }
+            writer.write("\n")
         }
-        val ext = file.extension.ifEmpty { "bmp" }
-        ImageIO.write(bufferedImage, ext, file)
+        writer.close()
     }
-    //Guardar como RLE
-    private fun saveAsRLE(matrix: ImageMatrix, file: File) {
+    private fun saveAsPGM(matrix: ImageMatrix, file: File) {
+        val mat = matrix.image
+        val width = mat.cols()
+        val height = mat.rows()
+        val channels = mat.channels()
+        val buffer = ByteArray(width * height * channels)
+        mat.get(0, 0, buffer)
         val writer = BufferedWriter(FileWriter(file))
-        val format = when (matrix.header) {
-            "P1" -> "P1"
-            "P2" -> "P2"
-            else -> "P3"
+        writer.write("P2\n")
+        writer.write("# Creado por ImageEditor (OpenCV)\n")
+        writer.write("$width $height\n")
+        writer.write("255\n")
+        var idx = 0
+        for (y in 0 until height) {
+            for (x in 0 until width) {
+                val valGray = buffer[idx].toInt() and 0xFF
+                writer.write("$valGray ")
+                idx += channels
+            }
+            writer.write("\n")
         }
+        writer.close()
+    }
+    private fun saveAsPPM(matrix: ImageMatrix, file: File) {
+        val mat = matrix.image
+        val width = mat.cols()
+        val height = mat.rows()
+        val channels = mat.channels()
+        if (channels < 3) {
+            throw Exception("Intentando guardar imagen de 1 canal como PPM (Color)")
+        }
+        val buffer = ByteArray(width * height * channels)
+        mat.get(0, 0, buffer)
+        val writer = BufferedWriter(FileWriter(file))
+        writer.write("P3\n")
+        writer.write("# Creado por ImageEditor (OpenCV)\n")
+        writer.write("$width $height\n")
+        writer.write("255\n")
+        var idx = 0
+        for (y in 0 until height) {
+            for (x in 0 until width) {
+                val b = buffer[idx].toInt() and 0xFF
+                val g = buffer[idx + 1].toInt() and 0xFF
+                val r = buffer[idx + 2].toInt() and 0xFF
+                writer.write("$r $g $b  ")
+                idx += channels
+            }
+            writer.write("\n")
+        }
+        writer.close()
+    }
+    private fun saveAsRLE(matrix: ImageMatrix, file: File) {
+        val mat = matrix.image
+        val width = mat.cols()
+        val height = mat.rows()
+        val channels = mat.channels()
+        val format = if (channels >= 3) "P3" else "P2"
+        val writer = BufferedWriter(FileWriter(file))
         writer.write("$format\n")
-        writer.write("# RLE Compressed by ImageEditor\n")
-        val maxValOut = if (format == "P1") 1 else 255
-        writer.write("${matrix.width} ${matrix.height}\n")
-        writer.write("$maxValOut\n")
+        writer.write("# RLE Compressed\n")
+        writer.write("$width $height\n")
+        writer.write("255\n")
+        val buffer = ByteArray(width * height * channels)
+        mat.get(0, 0, buffer)
+        var idx = 0
         var count = 0
         var lastR = -1
         var lastG = -1
         var lastB = -1
-        for (y in 0 until matrix.height) {
-            for (x in 0 until matrix.width) {
-                val p = matrix.pixels[y][x]
-                val currentR: Int
-                val currentG: Int
-                val currentB: Int
-                when (format) {
-                    "P1" -> {
-                        val binary = if (p.r < 128) 0 else 1
-                        currentR = binary; currentG = 0; currentB = 0
-                    }
-                    "P2" -> {
-                        currentR = p.r; currentG = 0; currentB = 0
-                    }
-                    else -> {
-                        currentR = p.r; currentG = p.g; currentB = p.b
-                    }
-                }
-                if (count == 0) {
-                    lastR = currentR
-                    lastG = currentG
-                    lastB = currentB
-                    count = 1
+        val totalPixels = width * height
+        for (i in 0 until totalPixels) {
+            var currR = 0
+            var currG = 0
+            var currB = 0
+            if (channels >= 3) {
+                val b = buffer[idx].toInt() and 0xFF
+                val g = buffer[idx + 1].toInt() and 0xFF
+                val r = buffer[idx + 2].toInt() and 0xFF
+                currR = r; currG = g; currB = b
+            } else {
+                val v = buffer[idx].toInt() and 0xFF
+                currR = v; currG = 0; currB = 0
+            }
+            if (i == 0) {
+                lastR = currR; lastG = currG; lastB = currB
+                count = 1
+            } else {
+                val areEqual = if (format == "P3") {
+                    (currR == lastR && currG == lastG && currB == lastB)
                 } else {
-                    val areEqual = when(format) {
-                        "P3" -> (currentR == lastR && currentG == lastG && currentB == lastB)
-                        else -> (currentR == lastR)
-                    }
-                    if (areEqual) {
-                        count++
-                    } else {
-                        writeRLEGroup(writer, format, lastR, lastG, lastB, count)
-                        lastR = currentR
-                        lastG = currentG
-                        lastB = currentB
-                        count = 1
-                    }
+                    (currR == lastR)
+                }
+                if (areEqual) {
+                    count++
+                } else {
+                    writeRLEGroup(writer, format, lastR, lastG, lastB, count)
+                    lastR = currR; lastG = currG; lastB = currB
+                    count = 1
                 }
             }
+            idx += channels
         }
         if (count > 0) {
             writeRLEGroup(writer, format, lastR, lastG, lastB, count)
@@ -305,16 +293,10 @@ class ImageStateController {
         writer.close()
     }
     private fun writeRLEGroup(writer: BufferedWriter, format: String, r: Int, g: Int, b: Int, count: Int) {
-        when (format) {
-            "P1" -> {
-                writer.write("$r $count\n")
-            }
-            "P2" -> {
-                writer.write("$r $count\n")
-            }
-            "P3" -> {
-                writer.write("$r $g $b $count\n")
-            }
+        if (format == "P3") {
+            writer.write("$r $g $b $count\n")
+        } else {
+            writer.write("$r $count\n")
         }
-    }*/
+    }
 }

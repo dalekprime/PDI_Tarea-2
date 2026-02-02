@@ -26,12 +26,12 @@ import javafx.stage.FileChooser
 import javafx.stage.Stage
 import models.ImageMatrix
 import models.Kernel
-import models.Pixel
 import java.awt.Desktop
 import java.io.File
-import kotlin.math.roundToInt
 import javafx.scene.control.CheckBox
 import org.opencv.core.Core
+import org.opencv.core.CvType
+import org.opencv.core.Mat
 import org.opencv.core.Scalar
 
 class BasicViewController {
@@ -294,7 +294,7 @@ class BasicViewController {
     @FXML
     fun onColorScalePickerClick(event: ActionEvent) {
         matrixImage?:return
-        //imageController.saveToHistory(matrixImage!!)
+        imageController.saveToHistory(matrixImage!!)
         matrixImage = tonoController.colorScale(matrixImage!!, colorScalePicker)
         imageController.changeView(matrixImage!!)
     }
@@ -304,7 +304,7 @@ class BasicViewController {
     @FXML
     fun onBrigthnessButtonClick(event: ActionEvent) {
         matrixImage?:return
-        //imageController.saveToHistory(matrixImage!!)
+        imageController.saveToHistory(matrixImage!!)
         matrixImage = ligthController.brightness(matrixImage!!, lightSlider.value)
         imageController.changeView(matrixImage!!)
         lightSlider.value = 0.0
@@ -315,7 +315,7 @@ class BasicViewController {
     @FXML
     fun onConstrastButtonClick(event: ActionEvent) {
         matrixImage?:return
-        //imageController.saveToHistory(matrixImage!!)
+        imageController.saveToHistory(matrixImage!!)
         matrixImage = ligthController.contrast(matrixImage!!, contrastSlider.value)
         imageController.changeView(matrixImage!!)
         contrastSlider.value = 1.0
@@ -491,29 +491,19 @@ class BasicViewController {
 
     private fun aplicarPerfilado(kernel: Kernel) {
         matrixImage?:return
-        /*val convolutionController = ConvolutionController()
+        val convolutionController = ConvolutionController()
         val laplacianImage = convolutionController.apply(matrixImage!!, kernel)
-        val width = matrixImage!!.width
-        val height = matrixImage!!.height
-        val newImage = ImageMatrix(width, height)
-        newImage.maxVal = matrixImage!!.maxVal
-        newImage.header = matrixImage!!.header
-
+        val dest = Mat()
         val alpha = 1.0
-        for (y in 0 until height) {
-            for (x in 0 until width) {
-                val orig = matrixImage!!.pixels[y][x]
-                val lap = laplacianImage.pixels[y][x]
-
-                val r = (orig.r + alpha * lap.r).roundToInt().coerceIn(0, 255)
-                val g = (orig.g + alpha * lap.g).roundToInt().coerceIn(0, 255)
-                val b = (orig.b + alpha * lap.b).roundToInt().coerceIn(0, 255)
-
-                newImage.pixels[y][x] = Pixel(r, g, b)
-            }
-        }
+        Core.addWeighted(
+            matrixImage!!.image, 1.0,
+            laplacianImage.image, alpha,
+            0.0,
+            dest
+        )
+        val newImage = ImageMatrix(dest)
         matrixImage = newImage
-        imageController.changeView(matrixImage!!)*/
+        imageController.changeView(newImage)
     }
 
     @FXML
@@ -618,8 +608,8 @@ class BasicViewController {
         val gx: ImageMatrix
         val gy: ImageMatrix
 
-        when (lastFilter) {
-            1 -> {
+        when {
+            radioSobel.isSelected -> {
                 val rows = rowsSpinnerSobel.value
                 val cols = colsSpinnerSobel.value
                 val kernelX = Kernel(rows, cols).generateSobel(rows, cols, "X")
@@ -627,7 +617,7 @@ class BasicViewController {
                 gx = ConvolutionController().apply(matrixImage!!, kernelX)
                 gy = ConvolutionController().apply(matrixImage!!, kernelY)
             }
-            2 -> {
+            radioPrewitt.isSelected -> {
                 val rows = rowsSpinnerPrewitt.value
                 val cols = colsSpinnerPrewitt.value
                 val kernelX = Kernel(rows, cols).generatePrewitt(rows, cols, "X")
@@ -635,14 +625,14 @@ class BasicViewController {
                 gx = ConvolutionController().apply(matrixImage!!, kernelX)
                 gy = ConvolutionController().apply(matrixImage!!, kernelY)
             }
-            3 -> {
+            radioRoberts.isSelected -> {
                 val kernelX = Kernel(2, 2).generateRoberts("X")
                 val kernelY = Kernel(2, 2).generateRoberts("Y")
                 gx = ConvolutionController().apply(matrixImage!!, kernelX)
                 gy = ConvolutionController().apply(matrixImage!!, kernelY)
             }
             else -> {
-                println("No se ha aplicado ningún filtro antes del gradiente")
+                println("No se ha selecionado ningún filtro antes del gradiente")
                 return
             }
         }
@@ -657,34 +647,36 @@ class BasicViewController {
         imageController.changeView(matrixImage!!)
     }
 
-    fun combineGradient(gx: ImageMatrix, gy: ImageMatrix): ImageMatrix? {
-        /*val result = ImageMatrix(width = gx.width, height = gx.height)
-        for (y in 0 until gx.height) {
-            for (x in 0 until gx.width) {
-                val valueX = gx[y, x]
-                val valueY = gy[y, x]
-                val magnitude = kotlin.math.sqrt(valueX * valueX + valueY * valueY)
-                result[y, x] = magnitude
-            }
-        }*/
-        return null
+    fun combineGradient(gx: ImageMatrix, gy: ImageMatrix): ImageMatrix{
+        val gxFloat = Mat()
+        val gyFloat = Mat()
+        gx.image.convertTo(gxFloat, CvType.CV_32F)
+        gy.image.convertTo(gyFloat, CvType.CV_32F)
+        val magnitude = Mat()
+        Core.magnitude(gxFloat, gyFloat, magnitude)
+        val result = Mat()
+        magnitude.convertTo(result, CvType.CV_8U)
+        gxFloat.release()
+        gyFloat.release()
+        magnitude.release()
+        return ImageMatrix(result)
     }
 
-    fun calculateAngles(gx: ImageMatrix, gy: ImageMatrix): ImageMatrix? {
-        /*val result = ImageMatrix(width = gx.width, height = gx.height)
-
-        for (y in 0 until gx.height) {
-            for (x in 0 until gx.width) {
-                val valueX = gx[y, x]
-                val valueY = gy[y, x]
-
-                val radians = kotlin.math.atan2(valueY, valueX)
-                val normalized = ((radians + Math.PI) / (2 * Math.PI)) * 255
-
-                result[y, x] = normalized
-            }
-        }*/
-        return null
+    fun calculateAngles(gx: ImageMatrix, gy: ImageMatrix): ImageMatrix {
+        val gxFloat = Mat()
+        val gyFloat = Mat()
+        gx.image.convertTo(gxFloat, CvType.CV_32F)
+        gy.image.convertTo(gyFloat, CvType.CV_32F)
+        val angles = Mat()
+        Core.phase(gxFloat, gyFloat, angles, false)
+        val scaleFactor = 255.0 / (2.0 * Math.PI)
+        Core.multiply(angles, Scalar(scaleFactor), angles)
+        val result = Mat()
+        angles.convertTo(result, CvType.CV_8U)
+        gxFloat.release()
+        gyFloat.release()
+        angles.release()
+        return ImageMatrix(result)
     }
 
 }

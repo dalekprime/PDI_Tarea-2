@@ -1,7 +1,6 @@
 package actions
 
 import models.ImageMatrix
-import models.Pixel
 import org.opencv.core.Core
 import org.opencv.core.Mat
 import org.opencv.core.Scalar

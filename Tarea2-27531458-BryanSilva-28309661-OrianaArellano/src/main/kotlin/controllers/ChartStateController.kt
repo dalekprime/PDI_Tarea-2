@@ -4,6 +4,11 @@ import javafx.scene.chart.AreaChart
 import javafx.scene.chart.LineChart
 import javafx.scene.chart.XYChart
 import models.ImageMatrix
+import org.opencv.core.Core
+import org.opencv.core.Mat
+import org.opencv.core.MatOfFloat
+import org.opencv.core.MatOfInt
+import org.opencv.imgproc.Imgproc
 
 class ChartStateController {
 
@@ -27,64 +32,61 @@ class ChartStateController {
     }
     //Actualiza el Histograma
     fun updateHistogram(imageMatrix: ImageMatrix?, channel: String) {
-        imageMatrix?:return
-        /*val getVal: (Int, Int) -> Int = when (channel) {
-            "R" -> { y, x -> imageMatrix.pixels[y][x].r }
-            "G" -> { y, x -> imageMatrix.pixels[y][x].g }
-            "B" -> { y, x -> imageMatrix.pixels[y][x].b }
-            else -> { _, _ -> 0 }
+        val mat = imageMatrix?.image ?: return
+        val channelIdx = when (channel) {
+            "B" -> 0
+            "G" -> 1
+            "R" -> 2
+            else -> return
         }
-        val frequency = IntArray(256)
-        val width = imageMatrix.width
-        val height = imageMatrix.height
-        for (y in 0 until height) {
-            for (x in 0 until width) {
-                val color = getVal(y, x).coerceIn(0, 255)
-                frequency[color]++
-            }
-        }
+        val images = ArrayList<Mat>()
+        images.add(mat)
+        val channels = MatOfInt(channelIdx)
+        val hist = Mat()
+        val histSize = MatOfInt(256)
+        val ranges = MatOfFloat(0f, 256f)
+        Imgproc.calcHist(images, channels, Mat(), hist, histSize, ranges)
+        val histData = FloatArray(256)
+        hist.get(0, 0, histData)
         val dataList = ArrayList<XYChart.Data<Number, Number>>(256)
         for (i in 0 until 256) {
-            dataList.add(XYChart.Data(i, frequency[i]))
+            dataList.add(XYChart.Data(i, histData[i]))
         }
         val series = XYChart.Series<Number, Number>()
         series.data.setAll(dataList)
         histogramChart.data.clear()
-        histogramChart.data.add(series)*/
+        histogramChart.data.add(series)
+        hist.release()
+        channels.release()
+        histSize.release()
+        ranges.release()
     }
     //Actualiza la Curva Tonal
     fun updateCurve(originalImage: ImageMatrix?, actualImage: ImageMatrix?, channel: String) {
-        /*originalImage ?: return
-        actualImage ?: return
-        /*if (originalImage.width != actualImage.width || originalImage.height != actualImage.height) {
-            toneCurveChart.data.clear()
-            return
-        }*/
-        val getOriginal: (Int, Int) -> Int = when (channel) {
-            "R" -> { y, x -> originalImage.pixels[y][x].r }
-            "G" -> { y, x -> originalImage.pixels[y][x].g }
-            "B" -> { y, x -> originalImage.pixels[y][x].b }
-            else -> { _, _ -> -1 }
+        val matOrig = originalImage?.image ?: return
+        val matCurr = actualImage?.image ?: return
+        if (matOrig.size() != matCurr.size()) return
+        val channelIdx = when (channel) {
+            "B" -> 0
+            "G" -> 1
+            "R" -> 2
+            else -> return
         }
-        val getActual: (Int, Int) -> Int = when (channel) {
-            "R" -> { y, x -> actualImage.pixels[y][x].r }
-            "G" -> { y, x -> actualImage.pixels[y][x].g }
-            "B" -> { y, x -> actualImage.pixels[y][x].b }
-            else -> { _, _ -> -1 }
-        }
+        val chOrig = Mat()
+        val chCurr = Mat()
+        Core.extractChannel(matOrig, chOrig, channelIdx)
+        Core.extractChannel(matCurr, chCurr, channelIdx)
+        val size = (chOrig.total()).toInt()
+        val buffOrig = ByteArray(size)
+        val buffCurr = ByteArray(size)
+        chOrig.get(0, 0, buffOrig)
+        chCurr.get(0, 0, buffCurr)
         val lookupTable = IntArray(256) { -1 }
-        val width = originalImage.width
-        val height = originalImage.height
-        val step = if (width * height > 1_000_000) 4 else 1
-        for (y in 0 until height step step) {
-            for (x in 0 until width step step) {
-                val valOriginal = getOriginal(y, x)
-                val valNuevo = getActual(y, x)
-
-                if (valOriginal in 0..255 && valNuevo != -1) {
-                    lookupTable[valOriginal] = valNuevo.coerceIn(0, 255)
-                }
-            }
+        val step = if (size > 1_000_000) 4 else 1
+        for (i in 0 until size step step) {
+            val valOriginal = buffOrig[i].toInt() and 0xFF
+            val valNuevo = buffCurr[i].toInt() and 0xFF
+            lookupTable[valOriginal] = valNuevo
         }
         val dataList = ArrayList<XYChart.Data<Number, Number>>()
         for (inputVal in 0 until 256) {
@@ -96,28 +98,38 @@ class ChartStateController {
         val series = XYChart.Series<Number, Number>()
         series.data.setAll(dataList)
         toneCurveChart.data.clear()
-        toneCurveChart.data.add(series)*/
+        toneCurveChart.data.add(series)
+        chOrig.release()
+        chCurr.release()
     }
     //Actuliza el Perfil de la Imagen
     fun updatePerfil(imageMatrix: ImageMatrix?, line: Int, channel: String) {
-        /*imageMatrix?: return
-        val width = imageMatrix.width
-        if (line < 0 || line >= (imageMatrix.height)) {
-            println("Error: La línea $line no existe")
-            return
+        val mat = imageMatrix?.image ?: return
+        val width = mat.cols()
+        val height = mat.rows()
+        var rline = line
+        if(line > height) rline = height
+        if (line < 0) rline = 0
+        val channelIdx = when (channel) {
+            "B" -> 0
+            "G" -> 1
+            "R" -> 2
+            else -> return
         }
+        val rowMat = mat.row(rline)
+        val channels = mat.channels()
+        val totalBytes = width * channels
+        val buffer = ByteArray(totalBytes)
+        rowMat.get(0, 0, buffer)
         val series = XYChart.Series<Number, Number>()
-        series.name = "Fila $line"
+        series.name = "Fila $rline ($channel)"
+        var idx = 0
         for (x in 0 until width) {
-            val color: Int = when (channel) {
-                "R" -> imageMatrix.pixels[line][x].r
-                "G" -> imageMatrix.pixels[line][x].g
-                "B" -> imageMatrix.pixels[line][x].b
-                else -> -1
-            }
-            series.data.add(XYChart.Data(x, color))
+            val value = buffer[idx + channelIdx].toInt() and 0xFF
+            series.data.add(XYChart.Data(x, value))
+            idx += channels
         }
         perfilerChart.data.clear()
-        perfilerChart.data.add(series)*/
+        perfilerChart.data.add(series)
     }
 }

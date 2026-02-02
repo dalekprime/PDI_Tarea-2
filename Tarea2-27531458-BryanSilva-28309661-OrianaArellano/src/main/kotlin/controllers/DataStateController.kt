@@ -2,9 +2,6 @@ package controllers
 
 import javafx.scene.control.Label
 import models.ImageMatrix
-import models.Pixel
-import kotlin.math.ceil
-import kotlin.math.log
 
 class DataStateController {
 
@@ -20,28 +17,42 @@ class DataStateController {
     }
 
     fun update(imageMatrix: ImageMatrix?) {
-        imageMatrix?: return
+        val mat = imageMatrix?.image ?: return
         //Setea las dimensiones
-        /*val width = imageMatrix.width
-        val height = imageMatrix.height
-        dimImage.text = "Dimensiones: ${imageMatrix.width} x ${imageMatrix.height}"
+        val width = imageMatrix.image.width()
+        val height = imageMatrix.image.height()
+        dimImage.text = "Dimensiones: $width x $height"
         //Setea la cantidad de colores unicos
-        val uniqueColors = HashSet<Pixel>()
-        for (y in 0 until height) {
-            for (x in 0 until width) {
-                val pixel = imageMatrix.pixels[y][x]
-                uniqueColors.add(pixel)
+        val uniqueColors = HashSet<Int>()
+        val channels = mat.channels()
+        val totalPixels = width.toLong() * height.toLong()
+        val bufferSize = (totalPixels * channels).toInt()
+        val buffer = ByteArray(bufferSize)
+        mat.get(0, 0, buffer)
+        var index = 0
+        if (channels >= 3) {
+            for (i in 0 until totalPixels.toInt()) {
+                val b = buffer[index].toInt() and 0xFF
+                val g = buffer[index + 1].toInt() and 0xFF
+                val r = buffer[index + 2].toInt() and 0xFF
+                var colorHash = (r shl 16) or (g shl 8) or b
+                if (channels == 4) {
+                    val a = buffer[index + 3].toInt() and 0xFF
+                    colorHash = (a shl 24) or colorHash
+                }
+                uniqueColors.add(colorHash)
+                index += channels
+            }
+        } else {
+            for (i in 0 until totalPixels.toInt()) {
+                val gray = buffer[index].toInt() and 0xFF
+                uniqueColors.add(gray)
+                index++
             }
         }
         colorsImage.text = "#Colores: ${uniqueColors.size}"
         //Setea la cantidad de bit por pixel
-        val bbp = when(imageMatrix.header){
-            "P1" -> 1
-            "P2" -> ceil(log(imageMatrix.maxVal.toDouble(), 2.0)).toInt()
-            "P3" -> ceil(3 * log(imageMatrix.maxVal.toDouble(), 2.0)).toInt()
-            "PNG/BMP" -> 24
-            else -> return
-        }
-        bppImage.text = "Bpp: $bbp"*/
+        val bpp = mat.elemSize() * 8
+        bppImage.text = "Bpp: ${bpp.toInt()}"
     }
 }
