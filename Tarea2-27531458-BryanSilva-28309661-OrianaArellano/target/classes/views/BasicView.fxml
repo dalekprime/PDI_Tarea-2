@@ -43,6 +43,7 @@
                         <MenuItem mnemonicParsing="false" onAction="#onLoadImageClick" text="Abrir Imagen" />
                         <MenuItem mnemonicParsing="false" onAction="#onDownLoadPNG" text="Guardar como PNG" />
                         <MenuItem mnemonicParsing="false" onAction="#onDownLoadBMP" text="Guardar como BMP" />
+                  <MenuItem mnemonicParsing="false" onAction="#onDownLoadJPG" text="Guardar como JPG" />
                         <MenuItem mnemonicParsing="false" onAction="#onDownLoadNetpbm" text="Guardar como Netpbm" />
                         <MenuItem mnemonicParsing="false" onAction="#onDownLoadRLE" text="Guardar como RLE" />
                     </items>
@@ -514,12 +515,12 @@
                                     </Button>
 
                                     <VBox alignment="CENTER_LEFT" spacing="5.0">
-                                        <RadioButton fx:id="radioZoomInBilinear" selected="true" style="-fx-font-size: 11px;" text="Bilineal" textFill="WHITE">
+                                        <RadioButton fx:id="radioZoomInBilinear" onAction="#onZoomSelectionClick" selected="true" style="-fx-font-size: 11px;" text="Bilineal" textFill="WHITE">
                                             <toggleGroup>
                                                 <ToggleGroup fx:id="groupZoomIn" />
                                             </toggleGroup>
                                         </RadioButton>
-                                        <RadioButton style="-fx-font-size: 11px;" text="Vecino Próximo" textFill="#aaaaaa" toggleGroup="$groupZoomIn" />
+                                        <RadioButton onAction="#onZoomSelectionClick" style="-fx-font-size: 11px;" text="Vecino Próximo" textFill="#aaaaaa" toggleGroup="$groupZoomIn" />
                                     </VBox>
                                 </HBox>
 
@@ -532,12 +533,12 @@
                                     </Button>
 
                                     <VBox alignment="CENTER_LEFT" spacing="5.0">
-                                        <RadioButton fx:id="radioZoomOutSS" selected="true" style="-fx-font-size: 11px;" text="Supersampling" textFill="WHITE">
+                                        <RadioButton fx:id="radioZoomOutSS" onAction="#onZoomSelectionClick" selected="true" style="-fx-font-size: 11px;" text="Supersampling" textFill="WHITE">
                                             <toggleGroup>
                                                 <ToggleGroup fx:id="groupZoomOut" />
                                             </toggleGroup>
                                         </RadioButton>
-                                        <RadioButton style="-fx-font-size: 11px;" text="Vecino Próximo" textFill="#aaaaaa" toggleGroup="$groupZoomOut" />
+                                        <RadioButton onAction="#onZoomSelectionClick" style="-fx-font-size: 11px;" text="Vecino Próximo" textFill="#aaaaaa" toggleGroup="$groupZoomOut" />
                                     </VBox>
                                 </HBox>
 

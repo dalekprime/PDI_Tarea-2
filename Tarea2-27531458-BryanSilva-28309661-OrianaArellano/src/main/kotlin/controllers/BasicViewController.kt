@@ -28,7 +28,6 @@ import models.ImageMatrix
 import models.Kernel
 import java.awt.Desktop
 import java.io.File
-import javafx.scene.control.CheckBox
 import org.opencv.core.Core
 import org.opencv.core.CvType
 import org.opencv.core.Mat
@@ -154,6 +153,11 @@ class BasicViewController {
     fun onDownLoadPNG(event: ActionEvent) {
         matrixImage?:return
         imageController.downloadImagePNG(matrixImage!!)
+    }
+    @FXML
+    fun onDownLoadJPG(event: ActionEvent) {
+        matrixImage?:return
+        imageController.downloadImageJPG(matrixImage!!)
     }
     @FXML
     fun onDownLoadRLE(event: ActionEvent) {
@@ -377,13 +381,36 @@ class BasicViewController {
     private var currentZoomMethod: String = "NONE"
     @FXML lateinit var radioZoomInBilinear: RadioButton
     @FXML lateinit var radioZoomOutSS: RadioButton
+    //Actualizacion de Zoom en Tiempo Real
+    @FXML
+    private lateinit var groupZoomIn: ToggleGroup
+    @FXML
+    private lateinit var groupZoomOut: ToggleGroup
+    @FXML
+    fun onZoomSelectionClick(event: ActionEvent) {
+        matrixImage?:return
+        if(currentZoomMethod == "inBLI" || currentZoomMethod == "INN"){
+            val selection = (groupZoomIn.selectedToggle as RadioButton).text
+            if(selection == "Bilineal") currentZoomMethod = "inBLI"
+            if(selection == "Vecino Próximo") currentZoomMethod = "INN"
+            println("${currentZoomMethod}, $selection")
+        }else if(currentZoomMethod == "OutSuperS" || currentZoomMethod == "OutN"){
+            val selection = (groupZoomOut.selectedToggle as RadioButton).text
+            if(selection == "Supersampling") currentZoomMethod = "OutSuperS"
+            if(selection == "Vecino Próximo") currentZoomMethod = "OutN"
+        }
+        imageController.updateZoom(currentZoomLevel, currentZoomMethod)
+        imageController.changeView(matrixImage!!)
+    }
     //Zoom In
     @FXML
     fun onZoomInClick(event: ActionEvent) {
         matrixImage ?: return
-        if (currentZoomLevel == -2) currentZoomLevel = 0
-        else if (currentZoomLevel == 0) currentZoomLevel += 2
-        else currentZoomLevel++
+        when (currentZoomLevel) {
+            -2 -> currentZoomLevel = 0
+            0 -> currentZoomLevel += 2
+            else -> currentZoomLevel++
+        }
         if(currentZoomLevel > 0) currentZoomMethod = if (radioZoomInBilinear.isSelected) "inBLI" else "INN"
         if(currentZoomLevel < 0) currentZoomMethod = if (radioZoomOutSS.isSelected) "OutSuperS" else "OutN"
         imageController.updateZoom(currentZoomLevel, currentZoomMethod)
@@ -393,9 +420,11 @@ class BasicViewController {
     @FXML
     fun onZoomOutClick(event: ActionEvent) {
         matrixImage ?: return
-        if (currentZoomLevel == 2) currentZoomLevel = 0
-        else if (currentZoomLevel == 0) currentZoomLevel -= 2
-        else currentZoomLevel--
+        when (currentZoomLevel) {
+            2 -> currentZoomLevel = 0
+            0 -> currentZoomLevel -= 2
+            else -> currentZoomLevel--
+        }
         if(currentZoomLevel > 0) currentZoomMethod = if (radioZoomInBilinear.isSelected) "inBLI" else "INN"
         if(currentZoomLevel < 0) currentZoomMethod = if (radioZoomOutSS.isSelected) "OutSuperS" else "OutN"
         imageController.updateZoom(currentZoomLevel, currentZoomMethod)

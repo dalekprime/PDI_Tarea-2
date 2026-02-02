@@ -55,7 +55,7 @@ class ImageStateController {
             title = "Selecionar Imagen"
             extensionFilters.add(FileChooser.ExtensionFilter(
                 "Imagen",
-                "*.png", "*.ppm", "*.pgm", "*.pbm", "*.bmp", "*.rle"))
+                "*.png", "*.ppm", "*.pgm", "*.pbm", "*.bmp", "*.jpg", "*.rle"))
             initialDirectory = File(System.getProperty("user.dir")+"/imagesTest")
         }
         val file: File? = fileChooser.showOpenDialog(stage)
@@ -63,7 +63,7 @@ class ImageStateController {
             dataLabel.text = "No se selecciono imagen"
             return null
         }
-        if (!file.exists() or ((file.extension.lowercase()) !in setOf("png", "ppm", "pgm", "pbm", "bmp", "rle"))) {
+        if (!file.exists() or ((file.extension.lowercase()) !in setOf("png", "ppm", "pgm", "pbm", "bmp", "jpg", "rle"))) {
             dataLabel.text = "Imagen Invalida"
             return null
         }
@@ -164,6 +164,7 @@ class ImageStateController {
         }
     }
     fun downloadImagePNG(imageMatrix: ImageMatrix) = saveStandard(imageMatrix, "png")
+    fun downloadImageJPG(imageMatrix: ImageMatrix) = saveStandard(imageMatrix, "jpg")
     fun downloadImagebmp(imageMatrix: ImageMatrix) = saveStandard(imageMatrix, "bmp")
     private fun saveStandard(imageMatrix: ImageMatrix, ext: String) {
         val fileChooser = FileChooser()
@@ -204,7 +205,6 @@ class ImageStateController {
         mat.get(0, 0, buffer)
         val writer = BufferedWriter(FileWriter(file))
         writer.write("P1\n")
-        writer.write("# Creado por ImageEditor (OpenCV)\n")
         writer.write("$width $height\n")
         var idx = 0
         val step = mat.channels()
@@ -228,7 +228,6 @@ class ImageStateController {
         mat.get(0, 0, buffer)
         val writer = BufferedWriter(FileWriter(file))
         writer.write("P2\n")
-        writer.write("# Creado por ImageEditor (OpenCV)\n")
         writer.write("$width $height\n")
         writer.write("255\n")
         var idx = 0
@@ -254,7 +253,6 @@ class ImageStateController {
         mat.get(0, 0, buffer)
         val writer = BufferedWriter(FileWriter(file))
         writer.write("P3\n")
-        writer.write("# Creado por ImageEditor (OpenCV)\n")
         writer.write("$width $height\n")
         writer.write("255\n")
         var idx = 0
@@ -278,7 +276,6 @@ class ImageStateController {
         val format = if (channels >= 3) "P3" else "P2"
         val writer = BufferedWriter(FileWriter(file))
         writer.write("$format\n")
-        writer.write("# RLE Compressed\n")
         writer.write("$width $height\n")
         writer.write("255\n")
         val buffer = ByteArray(width * height * channels)
