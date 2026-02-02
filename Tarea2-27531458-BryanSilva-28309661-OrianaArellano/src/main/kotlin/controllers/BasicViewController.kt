@@ -118,10 +118,6 @@ class BasicViewController {
     //Leer la imagen y setea el estado inicial de la aplicacion
     @FXML
     fun onLoadImageClick(event: ActionEvent) {
-        //Controladores de Imagen, Gráficos e Información
-        chartController = ChartStateController(histogramChart, toneCurveChart, perfilAreaChart)
-        dataController = DataStateController(dimImage, colorsImage, bppImage)
-        imageController = ImageStateController(stage,applicationConsole, mainImageView, chartController, dataController)
         //Controladores de Acción
         umbralizerController = UmbralizerController()
         tonoController = TonoController()
@@ -130,11 +126,18 @@ class BasicViewController {
         zoomController = ZoomController()
         controllerConvolution = ConvolutionController()
         noLinearController = NoLinearController()
+        //Controladores de Imagen, Gráficos e Información
+        chartController = ChartStateController(histogramChart, toneCurveChart, perfilAreaChart)
+        dataController = DataStateController(dimImage, colorsImage, bppImage)
+        imageController = ImageStateController(stage,applicationConsole, mainImageView, chartController, dataController, zoomController)
         //Leer Imagen Inicial y crea una copia
         matrixImage = imageController.loadNewImage()
         matrixImage?: return
         originalImage = matrixImage!!.copy()
         originalGeometryImage = matrixImage!!.copy()
+        //Restable el Zoom
+        currentZoomLevel = 0
+        currentZoomMethod =  "NONE"
     }
     //Descargar imagenes
     @FXML
@@ -370,45 +373,43 @@ class BasicViewController {
         matrixImage = rotationController.rotation180(matrixImage!!)
         imageController.changeView(matrixImage!!)
     }
+    private var currentZoomLevel: Int = 0
+    private var currentZoomMethod: String = "NONE"
+    @FXML lateinit var radioZoomInBilinear: RadioButton
+    @FXML lateinit var radioZoomOutSS: RadioButton
     //Zoom In
     @FXML
-    fun onZoomInNearestClick(event: ActionEvent) {
-        matrixImage?:return
-        originalGeometryImage = zoomController.zoomINN(originalGeometryImage!!, 2)
-        imageController.changeOriginalRotatedOrZoom(originalGeometryImage!!)
-        imageController.saveToHistory(matrixImage!!)
-        matrixImage = zoomController.zoomINN(matrixImage!!, 2)
-        imageController.changeView(matrixImage!!)
-    }
-    @FXML
-    fun onZoomInBilinearClick(event: ActionEvent) {
-        matrixImage?:return
-        originalGeometryImage = zoomController.zoomInBLI(originalGeometryImage!!, 2)
-        imageController.changeOriginalRotatedOrZoom(originalGeometryImage!!)
-        imageController.saveToHistory(matrixImage!!)
-        matrixImage = zoomController.zoomInBLI(matrixImage!!, 2)
+    fun onZoomInClick(event: ActionEvent) {
+        matrixImage ?: return
+        if (currentZoomLevel == -2) currentZoomLevel = 0
+        else if (currentZoomLevel == 0) currentZoomLevel += 2
+        else currentZoomLevel++
+        if(currentZoomLevel > 0) currentZoomMethod = if (radioZoomInBilinear.isSelected) "inBLI" else "INN"
+        if(currentZoomLevel < 0) currentZoomMethod = if (radioZoomOutSS.isSelected) "OutSuperS" else "OutN"
+        imageController.updateZoom(currentZoomLevel, currentZoomMethod)
         imageController.changeView(matrixImage!!)
     }
     //Zooom Out
     @FXML
-    fun onZoomOutNearestClick(event: ActionEvent) {
-        matrixImage?:return
-        originalGeometryImage = zoomController.zoomOutN(originalGeometryImage!!, 2)
-        imageController.changeOriginalRotatedOrZoom(originalGeometryImage!!)
-        imageController.saveToHistory(matrixImage!!)
-        matrixImage = zoomController.zoomOutN(matrixImage!!, 2)
+    fun onZoomOutClick(event: ActionEvent) {
+        matrixImage ?: return
+        if (currentZoomLevel == 2) currentZoomLevel = 0
+        else if (currentZoomLevel == 0) currentZoomLevel -= 2
+        else currentZoomLevel--
+        if(currentZoomLevel > 0) currentZoomMethod = if (radioZoomInBilinear.isSelected) "inBLI" else "INN"
+        if(currentZoomLevel < 0) currentZoomMethod = if (radioZoomOutSS.isSelected) "OutSuperS" else "OutN"
+        imageController.updateZoom(currentZoomLevel, currentZoomMethod)
         imageController.changeView(matrixImage!!)
     }
+    //Reset Zoom
     @FXML
-    fun onZoomOutSuperSampling(event: ActionEvent) {
-        matrixImage?:return
-        originalGeometryImage = zoomController.zoomOutSupersampling(originalGeometryImage!!, 2)
-        imageController.changeOriginalRotatedOrZoom(originalGeometryImage!!)
-        imageController.saveToHistory(matrixImage!!)
-        matrixImage = zoomController.zoomOutSupersampling(matrixImage!!, 2)
+    fun onResetZoomClick() {
+        matrixImage ?: return
+        currentZoomLevel = 0
+        currentZoomMethod = "NONE"
+        imageController.updateZoom(currentZoomLevel, currentZoomMethod)
         imageController.changeView(matrixImage!!)
     }
-
     //Convoluciones
     @FXML
     fun onCustomKernelButtonClick(event: ActionEvent) {
@@ -597,17 +598,13 @@ class BasicViewController {
     lateinit var radioPrewitt: RadioButton
     @FXML
     lateinit var radioRoberts: RadioButton
-    @FXML
-    private lateinit var chkShowDirection: CheckBox
 
     @FXML
     fun onApplyGradientClick(event: ActionEvent) {
         matrixImage?:return
         imageController.saveToHistory(matrixImage!!)
-
         val gx: ImageMatrix
         val gy: ImageMatrix
-
         when {
             radioSobel.isSelected -> {
                 val rows = rowsSpinnerSobel.value
@@ -636,17 +633,48 @@ class BasicViewController {
                 return
             }
         }
-        val resultImage = if (chkShowDirection.isSelected) {
-            // Si el usuario quiere ver la dirección del borde
-            calculateAngles(gx, gy)
-        } else {
-            // Si el usuario quiere ver la fuerza del borde (Lo normal)
-            combineGradient(gx, gy)
-        }
+        val resultImage = combineGradient(gx, gy)
         matrixImage = resultImage
         imageController.changeView(matrixImage!!)
     }
-
+    @FXML
+    fun onApplyGradientAngleClick(event: ActionEvent) {
+        matrixImage?:return
+        imageController.saveToHistory(matrixImage!!)
+        val gx: ImageMatrix
+        val gy: ImageMatrix
+        when {
+            radioSobel.isSelected -> {
+                val rows = rowsSpinnerSobel.value
+                val cols = colsSpinnerSobel.value
+                val kernelX = Kernel(rows, cols).generateSobel(rows, cols, "X")
+                val kernelY = Kernel(rows, cols).generateSobel(rows, cols, "Y")
+                gx = ConvolutionController().apply(matrixImage!!, kernelX)
+                gy = ConvolutionController().apply(matrixImage!!, kernelY)
+            }
+            radioPrewitt.isSelected -> {
+                val rows = rowsSpinnerPrewitt.value
+                val cols = colsSpinnerPrewitt.value
+                val kernelX = Kernel(rows, cols).generatePrewitt(rows, cols, "X")
+                val kernelY = Kernel(rows, cols).generatePrewitt(rows, cols, "Y")
+                gx = ConvolutionController().apply(matrixImage!!, kernelX)
+                gy = ConvolutionController().apply(matrixImage!!, kernelY)
+            }
+            radioRoberts.isSelected -> {
+                val kernelX = Kernel(2, 2).generateRoberts("X")
+                val kernelY = Kernel(2, 2).generateRoberts("Y")
+                gx = ConvolutionController().apply(matrixImage!!, kernelX)
+                gy = ConvolutionController().apply(matrixImage!!, kernelY)
+            }
+            else -> {
+                println("No se ha selecionado ningún filtro antes del gradiente")
+                return
+            }
+        }
+        val resultImage = calculateAngles(gx, gy)
+        matrixImage = resultImage
+        imageController.changeView(matrixImage!!)
+    }
     fun combineGradient(gx: ImageMatrix, gy: ImageMatrix): ImageMatrix{
         val gxFloat = Mat()
         val gyFloat = Mat()
@@ -661,7 +689,6 @@ class BasicViewController {
         magnitude.release()
         return ImageMatrix(result)
     }
-
     fun calculateAngles(gx: ImageMatrix, gy: ImageMatrix): ImageMatrix {
         val gxFloat = Mat()
         val gyFloat = Mat()

@@ -6,7 +6,6 @@
 <?import javafx.scene.chart.NumberAxis?>
 <?import javafx.scene.control.Accordion?>
 <?import javafx.scene.control.Button?>
-<?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.ColorPicker?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Menu?>
@@ -23,6 +22,7 @@
 <?import javafx.scene.control.TitledPane?>
 <?import javafx.scene.control.ToggleButton?>
 <?import javafx.scene.control.ToggleGroup?>
+<?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.ColumnConstraints?>
@@ -31,6 +31,7 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.SVGPath?>
 <?import javafx.scene.text.Font?>
 
 <VBox fx:id="basicView" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="700.0" prefWidth="1000.0" style="-fx-background-color: #2b2b2b;" stylesheets="@../styles.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.BasicViewController">
@@ -52,37 +53,127 @@
                     </items>
                 </Menu>
                 <Menu mnemonicParsing="false" text="About">
-               <items>
-                  <MenuItem mnemonicParsing="false" onAction="#onAboutClick" text="About" />
-               </items></Menu>
+                    <items>
+                        <MenuItem mnemonicParsing="false" onAction="#onAboutClick" text="About" />
+                    </items>
+                </Menu>
             </menus>
         </MenuBar>
+
         <HBox prefHeight="600.0" prefWidth="800.0" VBox.vgrow="ALWAYS">
             <children>
                 <VBox minWidth="260.0" prefHeight="548.0" prefWidth="260.0" style="-fx-background-color: #313335; -fx-border-color: #1e1e1e; -fx-border-width: 0 1 0 0;">
                     <children>
-                        <HBox alignment="CENTER" spacing="10.0" style="-fx-background-color: #3c3f41; -fx-padding: 10;">
+                        <HBox alignment="CENTER" spacing="10.0" styleClass="sidebar-box">
                             <children>
-                                <Button mnemonicParsing="false" onAction="#onUndoButtonClick" prefHeight="30.0" prefWidth="100.0" style="-fx-background-color: #4b6eaf; -fx-text-fill: white;" text="Undo">
-                                    <font>
-                                        <Font name="System Bold" size="12.0" />
-                                    </font></Button>
-                                <Button mnemonicParsing="false" onAction="#onRedoButtonClick" prefHeight="30.0" prefWidth="100.0" style="-fx-background-color: #4b6eaf; -fx-text-fill: white;" text="Redo">
-                                    <font>
-                                        <Font name="System Bold" size="12.0" />
-                                    </font></Button>
+                                <Button mnemonicParsing="false" onAction="#onUndoButtonClick" prefHeight="30.0" prefWidth="100.0" text="Undo" />
+                                <Button mnemonicParsing="false" onAction="#onRedoButtonClick" prefHeight="30.0" prefWidth="100.0" text="Redo" />
                             </children>
+                            <padding>
+                                <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                            </padding>
                         </HBox>
+
+                        <VBox spacing="5.0" styleClass="sidebar-box">
+                            <children>
+                                <Label styleClass="section-label" text="CONTROL DE MOVIMIENTO" />
+
+                                <GridPane alignment="CENTER" hgap="6.0" vgap="6.0">
+                                    <columnConstraints>
+                                        <ColumnConstraints halignment="CENTER" hgrow="NEVER" minWidth="28" prefWidth="28" />
+                                        <ColumnConstraints halignment="CENTER" hgrow="NEVER" minWidth="28" prefWidth="28" />
+                                        <ColumnConstraints halignment="CENTER" hgrow="NEVER" minWidth="28" prefWidth="28" />
+                                    </columnConstraints>
+                                    <rowConstraints>
+                                        <RowConstraints minHeight="28" prefHeight="28" valignment="CENTER" vgrow="NEVER" />
+                                        <RowConstraints minHeight="28" prefHeight="28" valignment="CENTER" vgrow="NEVER" />
+                                        <RowConstraints minHeight="28" prefHeight="28" valignment="CENTER" vgrow="NEVER" />
+                                    </rowConstraints>
+                                    <children>
+                                        <Button maxHeight="Infinity" maxWidth="Infinity" onAction="#onRotationClockAntiClick" styleClass="icon-button" GridPane.columnIndex="0" GridPane.rowIndex="0">
+                                            <graphic>
+                                                <SVGPath content="M12.5 8c-2.65 0-5.05.99-6.9 2.6L2 7v9h9l-3.62-3.62c1.39-1.16 3.16-1.88 5.12-1.88 3.54 0 6.55 2.31 7.6 5.5l2.37-.78C21.08 11.03 17.15 8 12.5 8z" scaleX="0.6" scaleY="0.6" styleClass="icon-svg" />
+                                            </graphic>
+                                            <tooltip><Tooltip text="Rotar -5°" /></tooltip>
+                                        </Button>
+
+                                        <Button maxHeight="Infinity" maxWidth="Infinity" styleClass="icon-button" GridPane.columnIndex="1" GridPane.rowIndex="0">
+                                            <graphic>
+                                                <SVGPath content="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z" scaleX="0.7" scaleY="0.7" styleClass="icon-svg" />
+                                            </graphic>
+                                        </Button>
+
+                                        <Button maxHeight="Infinity" maxWidth="Infinity" onAction="#onRotationClockClick" styleClass="icon-button" GridPane.columnIndex="2" GridPane.rowIndex="0">
+                                            <graphic>
+                                                <SVGPath content="M18.4 10.6C16.55 9 14.15 8 11.5 8c-4.65 0-8.58 3.03-9.96 7.22L3.9 16c1.05-3.19 4.05-5.5 7.6-5.5 1.95 0 3.73.72 5.12 1.88L13 16h9V7l-3.6 3.6z" scaleX="0.6" scaleY="0.6" styleClass="icon-svg" />
+                                            </graphic>
+                                            <tooltip><Tooltip text="Rotar +5°" /></tooltip>
+                                        </Button>
+
+                                        <Button maxHeight="Infinity" maxWidth="Infinity" styleClass="icon-button" GridPane.columnIndex="0" GridPane.rowIndex="1">
+                                            <graphic>
+                                                <SVGPath content="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6z" scaleX="0.7" scaleY="0.7" styleClass="icon-svg" />
+                                            </graphic>
+                                        </Button>
+
+                                        <Button maxHeight="Infinity" maxWidth="Infinity" onAction="#onRotation180Click" styleClass="icon-button" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                                            <graphic>
+                                                <SVGPath content="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6 0 1.01-.25 1.97-.7 2.8l1.46 1.46C19.54 15.03 20 13.57 20 12c0-4.42-3.58-8-8-8zm0 14c-3.31 0-6-2.69-6-6 0-1.01.25-1.97.7-2.8L5.24 7.74C4.46 8.97 4 10.43 4 12c0 4.42 3.58 8 8 8v3l4-4-4-4v3z" scaleX="0.6" scaleY="0.6" styleClass="icon-svg" />
+                                            </graphic>
+                                            <tooltip><Tooltip text="Girar 180°" /></tooltip>
+                                        </Button>
+
+                                        <Button maxHeight="Infinity" maxWidth="Infinity" styleClass="icon-button" GridPane.columnIndex="2" GridPane.rowIndex="1">
+                                            <graphic>
+                                                <SVGPath content="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6z" scaleX="0.7" scaleY="0.7" styleClass="icon-svg" />
+                                            </graphic>
+                                        </Button>
+
+                                        <Button maxHeight="Infinity" maxWidth="Infinity" onAction="#onMirrorHClick" styleClass="icon-button" GridPane.columnIndex="0" GridPane.rowIndex="2">
+                                            <graphic>
+                                                <SVGPath content="M6 21h12V7H6v14zm2-12h8v10H8V9zm8-2h-2V5h2v2zm-4 0h-2V5h2v2zm-4 0h-2V5h2v2zm-4 0H6V5h2v2z" scaleX="0.6" scaleY="0.6" styleClass="icon-svg" />
+                                            </graphic>
+                                            <tooltip><Tooltip text="Espejo Horizontal" /></tooltip>
+                                        </Button>
+
+                                        <Button maxHeight="Infinity" maxWidth="Infinity" styleClass="icon-button" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                                            <graphic>
+                                                <SVGPath content="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6z" scaleX="0.7" scaleY="0.7" styleClass="icon-svg" />
+                                            </graphic>
+                                        </Button>
+
+                                        <Button maxHeight="Infinity" maxWidth="Infinity" onAction="#onMirrorVClick" styleClass="icon-button" GridPane.columnIndex="2" GridPane.rowIndex="2">
+                                            <graphic>
+                                                <SVGPath content="M21 6H7v12h14V6zm-12 2h10v8H9V8zm-2 8H5v-2h2v2zm0-4H5v-2h2v2zm0-4H5V6h2v2z" scaleX="0.6" scaleY="0.6" styleClass="icon-svg" />
+                                            </graphic>
+                                            <tooltip><Tooltip text="Espejo Vertical" /></tooltip>
+                                        </Button>
+                                    </children>
+                                </GridPane>
+                            </children>
+                            <padding>
+                                <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                            </padding>
+                        </VBox>
 
                         <TabPane prefHeight="548.0" prefWidth="165.0" style="-fx-tab-min-height: 30;" tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS">
                             <tabs>
                                 <Tab text="Básicos">
                                     <content>
-                                        <Accordion style="-fx-background-color: #3c3f41;">
-                                            <panes>
-                                                <TitledPane animated="false" text="Tonalidad">
-                                                    <content>
-                                                        <VBox spacing="10.0" style="-fx-background-color: #3c3f41;">
+                                        <ScrollPane fitToWidth="true" style="-fx-background: transparent; -fx-background-color: transparent;">
+                                            <content>
+                                                <VBox spacing="10.0" style="-fx-background-color: #3c3f41;">
+                                                    <children>
+                                                        <Label text="Tonalidad" textFill="WHITE">
+                                                            <font>
+                                                                <Font name="System Bold" size="14.0" />
+                                                            </font>
+                                                            <padding>
+                                                                <Insets bottom="5.0" />
+                                                            </padding>
+                                                        </Label>
+
+                                                        <VBox spacing="5.0" styleClass="panel-box">
                                                             <children>
                                                                 <Label text="Escala y Color" textFill="#bbbbbb">
                                                                     <font>
@@ -104,89 +195,24 @@
                                                                 <ColorPicker fx:id="colorScalePicker" maxWidth="1.7976931348623157E308" />
                                                                 <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#onColorScalePickerClick" text="Aplicar Color Scale" />
                                                             </children>
-                                                            <padding>
-                                                                <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-                                                            </padding>
                                                         </VBox>
-                                                    </content>
-                                                </TitledPane>
-                                                <TitledPane animated="false" text="Transformación">
-                                                    <content>
-                                                        <ScrollPane fitToWidth="true" style="-fx-background: #3c3f41; -fx-background-color: transparent;">
-                                                            <content>
-                                                                <VBox spacing="10.0" style="-fx-background-color: #3c3f41;">
-                                                                    <children>
-                                                                        <Label text="Movimiento" textFill="#bbbbbb">
-                                                                            <font>
-                                                                                <Font name="System Bold" size="12.0" />
-                                                                            </font>
-                                                                        </Label>
-                                                                        <GridPane hgap="5.0" vgap="5.0">
-                                                                            <columnConstraints>
-                                                                                <ColumnConstraints hgrow="SOMETIMES" percentWidth="33.3" />
-                                                                                <ColumnConstraints hgrow="SOMETIMES" percentWidth="33.3" />
-                                                                                <ColumnConstraints hgrow="SOMETIMES" percentWidth="33.3" />
-                                                                            </columnConstraints>
-                                                                            <rowConstraints>
-                                                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                                                            </rowConstraints>
-                                                                            <children>
-                                                                                <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#onRotationClockClick" text="↶" GridPane.columnIndex="0" GridPane.rowIndex="0" />
-                                                                                <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="↑" GridPane.columnIndex="1" GridPane.rowIndex="0" />
-                                                                                <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#onRotationClockAntiClick" text="↷" GridPane.columnIndex="2" GridPane.rowIndex="0" />
-
-                                                                                <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="←" GridPane.columnIndex="0" GridPane.rowIndex="1" />
-
-                                                                                <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#onRotation180Click" style="-fx-font-size: 10;" text="180°" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-
-                                                                                <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="→" GridPane.columnIndex="2" GridPane.rowIndex="1" />
-
-                                                                                <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="↓" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-                                                            <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#onMirrorVClick" text="MirrorV" GridPane.rowIndex="2" />
-                                                            <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#onMirrorHClick" text="MirrorH" GridPane.columnIndex="2" GridPane.rowIndex="2" />
-                                                                            </children>
-                                                                        </GridPane>
-                                                                        <Separator opacity="0.3" prefWidth="200.0" />
-                                                                        <Label text="Zoom" textFill="#bbbbbb">
-                                                                            <font>
-                                                                                <Font name="System Bold" size="12.0" />
-                                                                            </font>
-                                                                        </Label>
-                                                                        <HBox spacing="5.0">
-                                                                            <children>
-                                                                                <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#onZoomInNearestClick" text="In (NN)" HBox.hgrow="ALWAYS" />
-                                                                                <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#onZoomInBilinearClick" text="In (Bi)" HBox.hgrow="ALWAYS" />
-                                                                            </children>
-                                                                        </HBox>
-                                                                        <HBox spacing="5.0">
-                                                                            <children>
-                                                                                <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#onZoomOutNearestClick" text="Out (NN)" HBox.hgrow="ALWAYS" />
-                                                                                <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#onZoomOutSuperSampling" text="Out (SS)" HBox.hgrow="ALWAYS" />
-                                                                            </children>
-                                                                        </HBox>
-                                                                    </children>
-                                                                    <padding>
-                                                                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-                                                                    </padding>
-                                                                </VBox>
-                                                            </content>
-                                                        </ScrollPane>
-                                                    </content>
-                                                </TitledPane>
-                                            </panes>
-                                        </Accordion>
+                                                    </children>
+                                                    <padding>
+                                                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                                    </padding>
+                                                </VBox>
+                                            </content>
+                                        </ScrollPane>
                                     </content>
                                 </Tab>
 
                                 <Tab text="Ajustes">
                                     <content>
-                                        <ScrollPane fitToWidth="true" style="-fx-background: #3c3f41; -fx-background-color: transparent;">
+                                        <ScrollPane fitToWidth="true" style="-fx-background: transparent; -fx-background-color: transparent;">
                                             <content>
                                                 <VBox spacing="15.0" style="-fx-background-color: #3c3f41;">
                                                     <children>
-                                                        <VBox spacing="5.0" style="-fx-background-color: #313335; -fx-background-radius: 5; -fx-padding: 10;">
+                                                        <VBox spacing="5.0" styleClass="panel-box">
                                                             <children>
                                                                 <Label text="Brillo" textFill="WHITE">
                                                                     <font>
@@ -198,7 +224,7 @@
                                                             </children>
                                                         </VBox>
 
-                                                        <VBox spacing="5.0" style="-fx-background-color: #313335; -fx-background-radius: 5; -fx-padding: 10;">
+                                                        <VBox spacing="5.0" styleClass="panel-box">
                                                             <children>
                                                                 <Label text="Contraste" textFill="WHITE">
                                                                     <font>
@@ -210,7 +236,7 @@
                                                             </children>
                                                         </VBox>
 
-                                                        <VBox spacing="5.0" style="-fx-background-color: #313335; -fx-background-radius: 5; -fx-padding: 10;">
+                                                        <VBox spacing="5.0" styleClass="panel-box">
                                                             <children>
                                                                 <Label text="Umbralización" textFill="WHITE">
                                                                     <font>
@@ -245,7 +271,7 @@
 
                                 <Tab text="Filtros">
                                     <content>
-                                        <ScrollPane fitToWidth="true" style="-fx-background: #3c3f41; -fx-background-color: transparent;">
+                                        <ScrollPane fitToWidth="true" style="-fx-background: transparent; -fx-background-color: transparent;">
                                             <content>
                                                 <VBox spacing="10.0" style="-fx-background-color: #3c3f41;">
                                                     <children>
@@ -255,7 +281,7 @@
                                                             </font>
                                                         </Label>
 
-                                                        <VBox spacing="5.0" style="-fx-background-color: #313335; -fx-background-radius: 5; -fx-padding: 8;">
+                                                        <VBox spacing="5.0" styleClass="panel-box">
                                                             <children>
                                                                 <HBox alignment="CENTER_LEFT" spacing="5.0">
                                                                     <children>
@@ -286,7 +312,7 @@
                                                             </font>
                                                         </Label>
 
-                                                        <VBox spacing="5.0" style="-fx-background-color: #313335; -fx-background-radius: 5; -fx-padding: 8;">
+                                                        <VBox spacing="5.0" styleClass="panel-box">
                                                             <children>
                                                                 <HBox alignment="CENTER_LEFT" spacing="10.0">
                                                                     <children>
@@ -310,7 +336,7 @@
                                                             </children>
                                                         </VBox>
 
-                                                        <VBox spacing="5.0" style="-fx-background-color: #313335; -fx-background-radius: 5; -fx-padding: 8;">
+                                                        <VBox spacing="5.0" styleClass="panel-box">
                                                             <children>
                                                                 <HBox alignment="CENTER_LEFT" spacing="10.0">
                                                                     <children>
@@ -334,7 +360,7 @@
                                                             </children>
                                                         </VBox>
 
-                                                        <VBox spacing="5.0" style="-fx-background-color: #313335; -fx-background-radius: 5; -fx-padding: 8;">
+                                                        <VBox spacing="5.0" styleClass="panel-box">
                                                             <children>
                                                                 <HBox alignment="CENTER_LEFT" spacing="10.0">
                                                                     <children>
@@ -365,16 +391,43 @@
                                                             <rowConstraints>
                                                                 <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                                                                 <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                                                             </rowConstraints>
                                                             <children>
                                                                 <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#onPerfilado4Click" text="Perfil 4" />
                                                                 <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#onPerfilado8Click" text="Perfil 8" GridPane.columnIndex="1" />
-                                                                <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#onApplyGradientClick" text="Gradiente" GridPane.rowIndex="1" />
-                                                                <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#onCustomKernelButtonClick" text="Custom Kernel" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                                                                <CheckBox fx:id="chkShowDirection" text="Mostrar Ángulo del Gradiente" GridPane.columnSpan="2" GridPane.rowIndex="2" />
+                                                                <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#onCustomKernelButtonClick" text="Custom Kernel" GridPane.columnSpan="2" GridPane.rowIndex="1" />
                                                             </children>
                                                         </GridPane>
+
+                                                        <Separator opacity="0.3" prefWidth="200.0" />
+                                                        <Label text="Gradientes" textFill="WHITE">
+                                                            <font>
+                                                                <Font name="System Bold" size="12.0" />
+                                                            </font>
+                                                        </Label>
+
+                                                        <VBox spacing="5.0" styleClass="panel-box">
+                                                            <children>
+                                                                <Label text="Operador Base:" textFill="#aaaaaa" />
+                                                                <HBox spacing="10.0">
+                                                                    <children>
+                                                                        <RadioButton fx:id="radioSobel" selected="true" text="Sobel" textFill="WHITE">
+                                                                            <toggleGroup>
+                                                                                <ToggleGroup fx:id="gradientBaseGroup" />
+                                                                            </toggleGroup>
+                                                                        </RadioButton>
+                                                                        <RadioButton fx:id="radioPrewitt" text="Prewitt" textFill="WHITE" toggleGroup="$gradientBaseGroup" />
+                                                                        <RadioButton fx:id="radioRoberts" text="Roberts" textFill="WHITE" toggleGroup="$gradientBaseGroup" />
+                                                                    </children>
+                                                                </HBox>
+                                                                <HBox alignment="CENTER" spacing="5.0">
+                                                                    <children>
+                                                                        <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#onApplyGradientClick" text="Magnitud" HBox.hgrow="ALWAYS" />
+                                                                        <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#onApplyGradientAngleClick" text="Ángulo" HBox.hgrow="ALWAYS" />
+                                                                    </children>
+                                                                </HBox>
+                                                            </children>
+                                                        </VBox>
                                                     </children>
                                                     <padding>
                                                         <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
@@ -402,32 +455,104 @@
 
                 <VBox prefHeight="548.0" prefWidth="240.0" style="-fx-background-color: #313335; -fx-border-color: #1e1e1e; -fx-border-width: 0 0 0 1;">
                     <children>
-                        <VBox spacing="5.0" style="-fx-background-color: #3c3f41; -fx-padding: 10;">
+                        <VBox spacing="5.0" styleClass="sidebar-box">
                             <children>
-                                <Label text="Propiedades de Imagen" textFill="#bbbbbb">
-                                    <font>
-                                        <Font name="System Bold" size="12.0" />
-                                    </font>
-                                </Label>
-                                <Label fx:id="dimImage" text="Dimensiones: -" textFill="WHITE">
-                                    <font>
-                                        <Font name="Arial Italic" size="13.0" />
-                                    </font>
-                                </Label>
-                                <Label fx:id="colorsImage" text="#Colores: -" textFill="WHITE">
-                                    <font>
-                                        <Font name="Arial Italic" size="13.0" />
-                                    </font>
-                                </Label>
-                                <Label fx:id="bppImage" text="Bpp: -" textFill="WHITE">
-                                    <font>
-                                        <Font name="Arial Italic" size="13.0" />
-                                    </font>
-                                </Label>
+                                <Label styleClass="section-label" text="INFORMACIÓN" />
+
+                                <GridPane hgap="10.0" style="-fx-background-color: #252526; -fx-background-radius: 5; -fx-padding: 10;" vgap="8.0">
+                                    <columnConstraints>
+                                        <ColumnConstraints hgrow="NEVER" minWidth="20.0" /> <ColumnConstraints hgrow="ALWAYS" />                </columnConstraints>
+                                    <rowConstraints>
+                                        <RowConstraints vgrow="SOMETIMES" />
+                                        <RowConstraints vgrow="SOMETIMES" />
+                                        <RowConstraints vgrow="SOMETIMES" />
+                                    </rowConstraints>
+                                    <children>
+
+                                        <StackPane GridPane.columnIndex="0" GridPane.rowIndex="0">
+                                            <SVGPath content="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z" scaleX="0.9" scaleY="0.9" styleClass="info-icon" />
+                                        </StackPane>
+                                        <VBox spacing="0" GridPane.columnIndex="1" GridPane.rowIndex="0">
+                                            <Label styleClass="info-label" text="Resolución" />
+                                            <Label fx:id="dimImage" styleClass="info-value" text="Sin imagen" />
+                                        </VBox>
+
+                                        <StackPane GridPane.columnIndex="0" GridPane.rowIndex="1">
+                                            <SVGPath content="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9c.83 0 1.5-.67 1.5-1.5 0-.39-.15-.74-.39-1.01-.23-.26-.38-.61-.38-.99 0-.83.67-1.5 1.5-1.5H16c2.76 0 5-2.24 5-5 0-4.42-4.03-8-9-8z" scaleX="0.9" scaleY="0.9" styleClass="info-icon" />
+                                        </StackPane>
+                                        <VBox spacing="0" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                                            <Label styleClass="info-label" text="Paleta de Color" />
+                                            <Label fx:id="colorsImage" styleClass="info-value" text="-" />
+                                        </VBox>
+
+                                        <StackPane GridPane.columnIndex="0" GridPane.rowIndex="2">
+                                            <SVGPath content="M9 3L5 6.99h3V14h2V6.99h3L9 3zm7 14.01V10h-2v7.01h-3L15 21l4-3.99h-3z" scaleX="0.9" scaleY="0.9" styleClass="info-icon" />
+                                        </StackPane>
+                                        <VBox spacing="0" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                                            <Label styleClass="info-label" text="Profundidad" />
+                                            <Label fx:id="bppImage" styleClass="info-value" text="-" />
+                                        </VBox>
+
+                                    </children>
+                                </GridPane>
                             </children>
                             <padding>
                                 <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                             </padding>
+                        </VBox>
+
+                        <VBox spacing="8.0" styleClass="sidebar-box">
+                            <children>
+                                <Label styleClass="section-label" text="Zoom" />
+
+                                <HBox alignment="CENTER_LEFT" spacing="10.0" style="-fx-background-color: #252526; -fx-background-radius: 5; -fx-padding: 5;">
+                                    <Button onAction="#onZoomInClick" prefHeight="40" prefWidth="40" styleClass="icon-button">
+                                        <graphic>
+                                            <SVGPath content="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z M12 10h-2v2h-1v-2H7V9h2V7h1v2h2v1z" scaleX="1.2" scaleY="1.2" styleClass="icon-svg" />
+                                        </graphic>
+                                        <tooltip><Tooltip text="Acercar (Zoom In)" /></tooltip>
+                                    </Button>
+
+                                    <VBox alignment="CENTER_LEFT" spacing="5.0">
+                                        <RadioButton fx:id="radioZoomInBilinear" selected="true" style="-fx-font-size: 11px;" text="Bilineal" textFill="WHITE">
+                                            <toggleGroup>
+                                                <ToggleGroup fx:id="groupZoomIn" />
+                                            </toggleGroup>
+                                        </RadioButton>
+                                        <RadioButton style="-fx-font-size: 11px;" text="Vecino Próximo" textFill="#aaaaaa" toggleGroup="$groupZoomIn" />
+                                    </VBox>
+                                </HBox>
+
+                                <HBox alignment="CENTER_LEFT" spacing="10.0" style="-fx-background-color: #252526; -fx-background-radius: 5; -fx-padding: 5;">
+                                    <Button onAction="#onZoomOutClick" prefHeight="40" prefWidth="40" styleClass="icon-button">
+                                        <graphic>
+                                            <SVGPath content="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z M7 9h5v1H7z" scaleX="1.2" scaleY="1.2" styleClass="icon-svg" />
+                                        </graphic>
+                                        <tooltip><Tooltip text="Alejar (Zoom Out)" /></tooltip>
+                                    </Button>
+
+                                    <VBox alignment="CENTER_LEFT" spacing="5.0">
+                                        <RadioButton fx:id="radioZoomOutSS" selected="true" style="-fx-font-size: 11px;" text="Supersampling" textFill="WHITE">
+                                            <toggleGroup>
+                                                <ToggleGroup fx:id="groupZoomOut" />
+                                            </toggleGroup>
+                                        </RadioButton>
+                                        <RadioButton style="-fx-font-size: 11px;" text="Vecino Próximo" textFill="#aaaaaa" toggleGroup="$groupZoomOut" />
+                                    </VBox>
+                                </HBox>
+
+                                <Button maxWidth="Infinity" onAction="#onResetZoomClick" style="-fx-background-color: #313335;" styleClass="icon-button">
+                                    <graphic>
+                                        <HBox alignment="CENTER" spacing="5">
+                                            <SVGPath content="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6 0 1.01-.25 1.97-.7 2.8l1.46 1.46C19.54 15.03 20 13.57 20 12c0-4.42-3.58-8-8-8zm0 14c-3.31 0-6-2.69-6-6 0-1.01.25-1.97.7-2.8L5.24 7.74C4.46 8.97 4 10.43 4 12c0 4.42 3.58 8 8 8v3l4-4-4-4v3z" scaleX="0.6" scaleY="0.6" styleClass="icon-svg" />
+                                            <Label style="-fx-font-size: 10px;" text="RESTAURAR VISTA (100%)" textFill="#aaaaaa" />
+                                        </HBox>
+                                    </graphic>
+                                </Button>
+                            </children>
+                     <padding>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                     </padding>
                         </VBox>
 
                         <Accordion fx:id="rightAccordion" style="-fx-background-color: #313335;" VBox.vgrow="ALWAYS">

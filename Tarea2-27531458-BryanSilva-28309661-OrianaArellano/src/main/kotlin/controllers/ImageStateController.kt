@@ -1,5 +1,6 @@
 package controllers
 
+import actions.ZoomController
 import javafx.scene.control.Label
 import javafx.scene.image.ImageView
 import javafx.stage.FileChooser
@@ -10,6 +11,7 @@ import java.io.BufferedWriter
 import java.io.File
 import java.io.FileWriter
 import java.util.Stack
+import kotlin.math.abs
 
 class ImageStateController {
     private val maxHistorySize = 5
@@ -26,11 +28,19 @@ class ImageStateController {
     private var chartController: ChartStateController
     private var dataController: DataStateController
 
+    //Referencia a Controlador de Zoom
+    private var zoomController: ZoomController
+
     //Imagen Inicial
     private lateinit var matrixImageOriginal: ImageMatrix
 
+    //Zoom data
+    private var currentZoomLevel: Int = 0
+    private var currentZoomMethod: String = "NONE"
+
     constructor(stage: Stage, label: Label, view: ImageView,
-                chartController: ChartStateController, dataController: DataStateController) {
+                chartController: ChartStateController, dataController: DataStateController,
+                zoomController: ZoomController) {
         this.stage = stage
         this.dataLabel = label
         this.imageView = view
@@ -38,6 +48,7 @@ class ImageStateController {
         this.dataController = dataController
         this.undoStack = Stack()
         this.redoStack = Stack()
+        this.zoomController = zoomController
     }
     fun loadNewImage(): ImageMatrix?{
         val fileChooser = FileChooser().apply{
@@ -60,12 +71,35 @@ class ImageStateController {
         redoStack.clear()
         val matrixImage =  ImageMatrix(file)
         matrixImageOriginal = matrixImage.copy()
+        currentZoomLevel = 0
+        currentZoomMethod = "NONE"
         changeView(matrixImage)
         dataLabel.text = "Imagen Cargada... ${file.name}"
         return matrixImage
     }
+    //Update Zoom Data
+    fun updateZoom(czl: Int, czm: String) {
+        this.currentZoomLevel = czl
+        this.currentZoomMethod = czm
+    }
     fun changeView(imageMatrix: ImageMatrix){
-        imageView.image = imageMatrix.matrixToImage()
+        //Calculo de Zoom
+        var imageToShow: ImageMatrix = imageMatrix
+        if ( currentZoomLevel == 0){
+            imageToShow = imageMatrix
+        }
+        else {
+            currentZoomLevel = abs(currentZoomLevel)
+            imageToShow = when(currentZoomMethod) {
+                "INN" -> zoomController.zoomINN(imageMatrix, currentZoomLevel)
+                "inBLI" -> zoomController.zoomInBLI(imageMatrix, currentZoomLevel)
+                "OutN" -> zoomController.zoomOutN(imageMatrix, currentZoomLevel)
+                "OutSuperS" -> zoomController.zoomOutSupersampling(imageMatrix, currentZoomLevel)
+                else -> imageMatrix
+            }
+        }
+        //Imagen
+        imageView.image = imageToShow.matrixToImage()
         //Crear primeros gráficos
         chartController.updateHistogram(imageMatrix, "R")
         chartController.updateCurve(matrixImageOriginal,imageMatrix, "R")

@@ -49,7 +49,10 @@ class ChartStateController {
         val histData = FloatArray(256)
         hist.get(0, 0, histData)
         val dataList = ArrayList<XYChart.Data<Number, Number>>(256)
-        for (i in 0 until 256) {
+        val hisCopy = histData.copyOf()
+        hisCopy.sort()
+        val base: Int = if(hisCopy[255] / hisCopy[254] > 3 ) 1 else 0
+        for (i in base until 256) {
             dataList.add(XYChart.Data(i, histData[i]))
         }
         val series = XYChart.Series<Number, Number>()
