@@ -33,12 +33,16 @@ class ChartStateController {
     //Actualiza el Histograma
     fun updateHistogram(imageMatrix: ImageMatrix?, channel: String) {
         val mat = imageMatrix?.image ?: return
-        val channelIdx = when (channel) {
+        var channelIdx = when (channel) {
             "B" -> 0
             "G" -> 1
             "R" -> 2
             else -> return
         }
+        if (mat.channels() == 1) {
+            channelIdx = 0
+        }
+        if (channelIdx >= mat.channels()) return
         val images = ArrayList<Mat>()
         images.add(mat)
         val channels = MatOfInt(channelIdx)
@@ -69,11 +73,14 @@ class ChartStateController {
         val matOrig = originalImage?.image ?: return
         val matCurr = actualImage?.image ?: return
         if (matOrig.size() != matCurr.size()) return
-        val channelIdx = when (channel) {
+        var channelIdx = when (channel) {
             "B" -> 0
             "G" -> 1
             "R" -> 2
             else -> return
+        }
+        if (matOrig.channels() == 1 || matCurr.channels() == 1)  {
+            channelIdx = 0
         }
         val chOrig = Mat()
         val chCurr = Mat()
@@ -113,11 +120,14 @@ class ChartStateController {
         var rline = line
         if(line > height) rline = height
         if (line < 0) rline = 0
-        val channelIdx = when (channel) {
+        var channelIdx = when (channel) {
             "B" -> 0
             "G" -> 1
             "R" -> 2
             else -> return
+        }
+        if (mat.channels() == 1) {
+            channelIdx = 0
         }
         val rowMat = mat.row(rline)
         val channels = mat.channels()

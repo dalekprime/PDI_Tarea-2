@@ -11,35 +11,37 @@ class UmbralizerController {
     fun simpleUmbral(imageMatrix: ImageMatrix, threshold: Number): ImageMatrix {
         val t = threshold.toDouble()
         val grayMat = Mat()
-        if (imageMatrix.image.channels() == 4) {
-            Imgproc.cvtColor(imageMatrix.image, grayMat, Imgproc.COLOR_BGRA2GRAY)
+        if (imageMatrix.image.channels() >= 3) {
+            if (imageMatrix.image.channels() == 4) {
+                Imgproc.cvtColor(imageMatrix.image, grayMat, Imgproc.COLOR_BGRA2GRAY)
+            } else {
+                Imgproc.cvtColor(imageMatrix.image, grayMat, Imgproc.COLOR_BGR2GRAY)
+            }
         } else {
-            Imgproc.cvtColor(imageMatrix.image, grayMat, Imgproc.COLOR_BGR2GRAY)
+            imageMatrix.image.copyTo(grayMat)
         }
         val binaryMat = Mat()
         Imgproc.threshold(grayMat, binaryMat, t, 255.0, Imgproc.THRESH_BINARY)
         grayMat.release()
-        val resultMat = Mat()
-        Imgproc.cvtColor(binaryMat, resultMat, Imgproc.COLOR_GRAY2BGR)
-        binaryMat.release()
-        return ImageMatrix(resultMat)
+        return ImageMatrix(binaryMat)
     }
     //Umbral Multiple
     fun multiUmbral(imageMatrix: ImageMatrix, thresholdInf: Number, thresholdSup: Number): ImageMatrix {
         val t1 = thresholdInf.toDouble()
         val t2 = thresholdSup.toDouble()
         val grayMat = Mat()
-        if (imageMatrix.image.channels() == 4) {
-            Imgproc.cvtColor(imageMatrix.image, grayMat, Imgproc.COLOR_BGRA2GRAY)
+        if (imageMatrix.image.channels() >= 3) {
+            if (imageMatrix.image.channels() == 4) {
+                Imgproc.cvtColor(imageMatrix.image, grayMat, Imgproc.COLOR_BGRA2GRAY)
+            } else {
+                Imgproc.cvtColor(imageMatrix.image, grayMat, Imgproc.COLOR_BGR2GRAY)
+            }
         } else {
-            Imgproc.cvtColor(imageMatrix.image, grayMat, Imgproc.COLOR_BGR2GRAY)
+            imageMatrix.image.copyTo(grayMat)
         }
         val binaryMat = Mat()
         Core.inRange(grayMat, Scalar(t1), Scalar(t2), binaryMat)
         grayMat.release()
-        val resultMat = Mat()
-        Imgproc.cvtColor(binaryMat, resultMat, Imgproc.COLOR_GRAY2BGR)
-        binaryMat.release()
-        return ImageMatrix(resultMat)
+        return ImageMatrix(binaryMat)
     }
 }

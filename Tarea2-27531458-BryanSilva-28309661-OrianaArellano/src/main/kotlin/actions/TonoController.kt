@@ -16,13 +16,15 @@ class TonoController {
     }
     //Escala de Grises
     fun greyScale(imageMatrix: ImageMatrix): ImageMatrix {
+        if (imageMatrix.image.channels() == 1) {
+            return imageMatrix.copy()
+        }
         val newImage = Mat()
         if (imageMatrix.image.channels() == 4) {
             Imgproc.cvtColor(imageMatrix.image, newImage, Imgproc.COLOR_BGRA2GRAY)
         } else {
             Imgproc.cvtColor(imageMatrix.image, newImage, Imgproc.COLOR_BGR2GRAY)
         }
-        Imgproc.cvtColor(newImage, newImage, Imgproc.COLOR_GRAY2BGR)
         return ImageMatrix(newImage);
     }
     //Escala de Color
