@@ -358,20 +358,20 @@ class BasicViewController {
     @FXML
     fun onRotationClockClick(event: ActionEvent) {
         matrixImage?:return
-        originalGeometryImage = rotationController.rotation(originalGeometryImage!!, 5.0)
+        originalGeometryImage = rotationController.rotation(originalGeometryImage!!, -5.0)
         imageController.changeOriginalRotatedOrZoom(originalGeometryImage!!)
         imageController.saveToHistory(matrixImage!!)
-        matrixImage = rotationController.rotation(matrixImage!!, 5.0)
+        matrixImage = rotationController.rotation(matrixImage!!, -5.0)
         imageController.changeView(matrixImage!!)
     }
     //Rotacion AntiClockwise
     @FXML
     fun onRotationClockAntiClick(event: ActionEvent) {
         matrixImage?:return
-        originalGeometryImage = rotationController.rotation(originalGeometryImage!!, -5.0)
+        originalGeometryImage = rotationController.rotation(originalGeometryImage!!, +5.0)
         imageController.changeOriginalRotatedOrZoom(originalGeometryImage!!)
         imageController.saveToHistory(matrixImage!!)
-        matrixImage = rotationController.rotation(matrixImage!!, -5.0)
+        matrixImage = rotationController.rotation(matrixImage!!, +5.0)
         imageController.changeView(matrixImage!!)
     }
     //Rotacion 180 grados

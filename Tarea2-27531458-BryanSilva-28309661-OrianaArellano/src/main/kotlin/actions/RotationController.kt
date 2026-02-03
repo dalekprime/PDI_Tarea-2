@@ -26,29 +26,24 @@ class RotationController {
     //Rotacion
     fun rotation(imageMatrix: ImageMatrix, angle: Double): ImageMatrix {
         val src = imageMatrix.image
-        val width = src.cols()
-        val height = src.rows()
-        val center = Point(width / 2.0, height / 2.0)
+        val radians = Math.toRadians(angle)
+        val sin = abs(kotlin.math.sin(radians))
+        val cos = abs(kotlin.math.cos(radians))
+        val newWidth = (src.width() * cos + src.height() * sin).toInt()
+        val newHeight = (src.width() * sin + src.height() * cos).toInt()
+        val center = Point(src.width() / 2.0, src.height() / 2.0)
         val rotationMat = Imgproc.getRotationMatrix2D(center, angle, 1.0)
-        val absCos = abs(rotationMat.get(0, 0)[0])
-        val absSin = abs(rotationMat.get(0, 1)[0])
-        val newWidth = (height * absSin + width * absCos).toInt()
-        val newHeight = (height * absCos + width * absSin).toInt()
-        val oldCenterX = center.x
-        val oldCenterY = center.y
-        val newCenterX = newWidth / 2.0
-        val newCenterY = newHeight / 2.0
-        rotationMat.put(0, 2, rotationMat.get(0, 2)[0] + (newCenterX - oldCenterX))
-        rotationMat.put(1, 2, rotationMat.get(1, 2)[0] + (newCenterY - oldCenterY))
+        rotationMat.put(0, 2, rotationMat.get(0, 2)[0] + (newWidth / 2.0 - center.x))
+        rotationMat.put(1, 2, rotationMat.get(1, 2)[0] + (newHeight / 2.0 - center.y))
         val dest = Mat()
         Imgproc.warpAffine(
             src,
             dest,
             rotationMat,
             Size(newWidth.toDouble(), newHeight.toDouble()),
-            Imgproc.INTER_LANCZOS4,
+            Imgproc.INTER_LINEAR,
             Core.BORDER_CONSTANT,
-            Scalar(0.0, 0.0, 0.0, 0.0)
+            Scalar(0.0, 0.0, 0.0, 0.0) // Fondo transparente/negro
         )
         rotationMat.release()
         return ImageMatrix(dest)
