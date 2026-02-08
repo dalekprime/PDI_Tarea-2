@@ -16,15 +16,30 @@ class ImageMatrix {
     var image: Mat
     var currentRotationLevel: Double
     var currentRotationMethod: String
+    var currentPanningLevelX0: Double
+    var currentPanningLevelY0: Double
+    var currentPanningLevelX1: Double
+    var currentPanningLevelY1: Double
+    var currentPanningMethod: String
     constructor(content: Mat) {
         image = content
         currentRotationLevel = 0.0
         currentRotationMethod = "NOEX"
+        currentPanningLevelX0 = 0.0
+        currentPanningLevelY0 = 0.0
+        currentPanningLevelX1 = image.width().toDouble()
+        currentPanningLevelY1 = image.height().toDouble()
+        currentPanningMethod = "NOEX"
     }
     constructor(content: Mat, oldImage: ImageMatrix) {
         image = content
         currentRotationLevel = oldImage.currentRotationLevel
         currentRotationMethod = oldImage.currentRotationMethod
+        currentPanningLevelX0 = oldImage.currentPanningLevelX0
+        currentPanningLevelY0 = oldImage.currentPanningLevelY0
+        currentPanningLevelX1 = oldImage.currentPanningLevelX1
+        currentPanningLevelY1 = oldImage.currentPanningLevelY1
+        currentPanningMethod = oldImage.currentPanningMethod
     }
     constructor(file: File){
         if (file.extension.equals("rle", ignoreCase = true)) {
@@ -37,6 +52,11 @@ class ImageMatrix {
         }
         currentRotationLevel = 0.0
         currentRotationMethod = "NOEX"
+        currentPanningLevelX0 = 0.0
+        currentPanningLevelY0 = 0.0
+        currentPanningLevelX1 = image.width().toDouble()
+        currentPanningLevelY1 = image.height().toDouble()
+        currentPanningMethod = "NOEX"
     }
     private fun loadFromRLE(file: File): Mat {
         val reader = BufferedReader(FileReader(file))
@@ -153,6 +173,11 @@ class ImageMatrix {
         val newMatrix = ImageMatrix(image.clone())
         newMatrix.currentRotationLevel = currentRotationLevel
         newMatrix.currentRotationMethod = currentRotationMethod
+        newMatrix.currentPanningLevelX0 = currentPanningLevelX0
+        newMatrix.currentPanningLevelY0 = currentPanningLevelY0
+        newMatrix.currentPanningLevelX1 = currentPanningLevelX1
+        newMatrix.currentPanningLevelY1 = currentPanningLevelY1
+        newMatrix.currentPanningMethod = currentPanningMethod
         return newMatrix
     }
 }

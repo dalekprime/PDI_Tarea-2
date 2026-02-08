@@ -1,5 +1,6 @@
 package controllers
 
+import actions.PanningController
 import actions.RotationController
 import actions.ZoomController
 import javafx.scene.control.Label
@@ -32,6 +33,7 @@ class ImageStateController {
     //Referencia a Controladores de Transformacion
     private var zoomController: ZoomController
     private var rotationController: RotationController
+    private var panningController: PanningController
 
     //Imagen Inicial
     private lateinit var matrixImageOriginal: ImageMatrix
@@ -42,7 +44,8 @@ class ImageStateController {
 
     constructor(stage: Stage, label: Label, view: ImageView,
                 chartController: ChartStateController, dataController: DataStateController,
-                zoomController: ZoomController, rotationController: RotationController) {
+                zoomController: ZoomController, rotationController: RotationController,
+                panningController: PanningController) {
         this.stage = stage
         this.dataLabel = label
         this.imageView = view
@@ -52,6 +55,7 @@ class ImageStateController {
         this.redoStack = Stack()
         this.zoomController = zoomController
         this.rotationController = rotationController
+        this.panningController = panningController
     }
     fun loadNewImage(): ImageMatrix?{
         val fileChooser = FileChooser().apply{
@@ -85,30 +89,48 @@ class ImageStateController {
         this.currentZoomLevel = czl
         this.currentZoomMethod = czm
     }
-    fun changeView(imageMatrix: ImageMatrix){
-        var imageToShow: ImageMatrix = imageMatrix
-        //Calculo de Rotacion
-        if(imageMatrix.currentRotationLevel == 0.0){
-            imageToShow = imageMatrix
-        }
-        else {
-            imageToShow = when(imageMatrix.currentRotationMethod) {
-                "EX" -> rotationController.rotationEX(imageMatrix, imageMatrix.currentRotationLevel)
-                "NOEX" -> rotationController.rotationNoEX(imageMatrix, imageMatrix.currentRotationLevel)
+    //Transformation Pipeline
+    fun transform(imageMatrix: ImageMatrix, download: Boolean): ImageMatrix{
+        var imageToShow: ImageMatrix = imageMatrix.copy()
+        //Calculo de Panning
+        if(imageToShow.currentPanningLevelX0 != 0.0 || imageToShow.currentPanningLevelY0 != 0.0 ||
+            imageToShow.currentPanningLevelX1 != imageToShow.image.width().toDouble() ||
+            imageToShow.currentPanningLevelY1 != imageToShow.image.height().toDouble()) {
+            imageToShow = when (imageMatrix.currentPanningMethod) {
+                "EX" -> panningController.panningNOEX(imageToShow, imageToShow.currentPanningLevelX0,
+                    imageToShow.currentPanningLevelY0, imageToShow.currentPanningLevelX1,
+                    imageToShow.currentPanningLevelY1)
+                "NOEX" -> panningController.panningNOEX(imageToShow, imageToShow.currentPanningLevelX0,
+                    imageToShow.currentPanningLevelY0, imageToShow.currentPanningLevelX1,
+                    imageToShow.currentPanningLevelY1)
                 else -> imageMatrix
             }
         }
-        //Calculo de Zoom
-        if (currentZoomLevel != 0) {
-            val currentZoomLevelAbs = abs(currentZoomLevel)
-            imageToShow = when(currentZoomMethod) {
-                "INN" -> zoomController.zoomINN(imageToShow, currentZoomLevelAbs)
-                "inBLI" -> zoomController.zoomInBLI(imageToShow, currentZoomLevelAbs)
-                "OutN" -> zoomController.zoomOutN(imageToShow, currentZoomLevelAbs)
-                "OutSuperS" -> zoomController.zoomOutSupersampling(imageToShow, currentZoomLevelAbs)
+        //Calculo de Rotacion
+        if(imageToShow.currentRotationLevel != 0.0) {
+            imageToShow = when(imageToShow.currentRotationMethod) {
+                "EX" -> rotationController.rotationEX(imageToShow, imageToShow.currentRotationLevel)
+                "NOEX" -> rotationController.rotationNoEX(imageToShow, imageToShow.currentRotationLevel)
                 else -> imageToShow
             }
         }
+        if(!download) {
+            //Calculo de Zoom
+            if (currentZoomLevel != 0) {
+                val currentZoomLevelAbs = abs(currentZoomLevel)
+                imageToShow = when(currentZoomMethod) {
+                    "INN" -> zoomController.zoomINN(imageToShow, currentZoomLevelAbs)
+                    "inBLI" -> zoomController.zoomInBLI(imageToShow, currentZoomLevelAbs)
+                    "OutN" -> zoomController.zoomOutN(imageToShow, currentZoomLevelAbs)
+                    "OutSuperS" -> zoomController.zoomOutSupersampling(imageToShow, currentZoomLevelAbs)
+                    else -> imageToShow
+                }
+            }
+        }
+        return imageToShow
+    }
+    fun changeView(imageMatrix: ImageMatrix){
+        val imageToShow: ImageMatrix = transform(imageMatrix, false)
         //Imagen
         imageView.image = imageToShow.matrixToImage()
         //Crear primeros gráficos
@@ -148,11 +170,12 @@ class ImageStateController {
         return image
     }
     fun downloadImageNetpbm(imageMatrix: ImageMatrix){
+        val imageToDown: ImageMatrix = transform(imageMatrix, true)
         val fileChooser = FileChooser()
         fileChooser.title = "Guardar Imagen NetPBM"
         fileChooser.initialFileName = "imagen_editada"
         fileChooser.initialDirectory = File(System.getProperty("user.dir") + "/imagesTest")
-        val channels = imageMatrix.image.channels()
+        val channels = imageToDown.image.channels()
         if (channels == 1) {
             fileChooser.extensionFilters.add(FileChooser.ExtensionFilter("NetPBM Graymap (P2)", "*.pgm"))
             fileChooser.extensionFilters.add(FileChooser.ExtensionFilter("NetPBM Bitmap (P1)", "*.pbm"))
@@ -162,11 +185,11 @@ class ImageStateController {
         val file = fileChooser.showSaveDialog(stage) ?: return
         try {
             val ext = file.extension.lowercase()
-            when {
-                ext == "pbm" -> saveAsPBM(imageMatrix, file)
-                ext == "pgm" -> saveAsPGM(imageMatrix, file)
-                ext == "ppm" -> saveAsPPM(imageMatrix, file)
-                else -> saveAsPPM(imageMatrix, file) // Default
+            when (ext) {
+                "pbm" -> saveAsPBM(imageToDown, file)
+                "pgm" -> saveAsPGM(imageToDown, file)
+                "ppm" -> saveAsPPM(imageToDown, file)
+                else -> saveAsPPM(imageToDown, file)
             }
             dataLabel.text = "Guardado NetPBM exitoso: ${file.name}"
         } catch (e: Exception) {
@@ -178,6 +201,7 @@ class ImageStateController {
     fun downloadImageJPG(imageMatrix: ImageMatrix) = saveStandard(imageMatrix, "jpg")
     fun downloadImagebmp(imageMatrix: ImageMatrix) = saveStandard(imageMatrix, "bmp")
     private fun saveStandard(imageMatrix: ImageMatrix, ext: String) {
+        val imageToDown: ImageMatrix = transform(imageMatrix, true)
         val fileChooser = FileChooser()
         fileChooser.title = "Guardar Imagen $ext"
         fileChooser.initialFileName = "imagen_editada.$ext"
@@ -185,7 +209,7 @@ class ImageStateController {
         fileChooser.extensionFilters.add(FileChooser.ExtensionFilter(ext.uppercase(), "*.$ext"))
         val file = fileChooser.showSaveDialog(stage) ?: return
         try {
-            val success = Imgcodecs.imwrite(file.absolutePath, imageMatrix.image)
+            val success = Imgcodecs.imwrite(file.absolutePath, imageToDown.image)
             if (success) dataLabel.text = "Guardado $ext exitoso: ${file.name}"
             else dataLabel.text = "Error interno de OpenCV al guardar"
         } catch (e: Exception) {
@@ -193,6 +217,7 @@ class ImageStateController {
         }
     }
     fun downloadImageRLE(imageMatrix: ImageMatrix) {
+        val imageToDown: ImageMatrix = transform(imageMatrix, true)
         val fileChooser = FileChooser().apply {
             title = "Guardar comprimido RLE"
             initialFileName = "imagen_comprimida.rle"
@@ -201,7 +226,7 @@ class ImageStateController {
         }
         val file = fileChooser.showSaveDialog(stage) ?: return
         try {
-            saveAsRLE(imageMatrix, file)
+            saveAsRLE(imageToDown, file)
             dataLabel.text = "Guardado RLE exitoso: ${file.name}"
         } catch (e: Exception) {
             dataLabel.text = "Error al guardar RLE: ${e.message}"

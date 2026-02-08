@@ -3,6 +3,7 @@ package controllers
 import actions.ConvolutionController
 import actions.LigthController
 import actions.NoLinearController
+import actions.PanningController
 import actions.RotationController
 import actions.UmbralizerController
 import actions.TonoController
@@ -12,6 +13,7 @@ import javafx.fxml.FXML
 import javafx.scene.chart.AreaChart
 import javafx.scene.chart.LineChart
 import javafx.scene.control.Accordion
+import javafx.scene.control.Button
 import javafx.scene.control.ColorPicker
 import javafx.scene.control.Label
 import javafx.scene.control.RadioButton
@@ -64,6 +66,7 @@ class BasicViewController {
     private lateinit var zoomController: ZoomController
     private lateinit var controllerConvolution: ConvolutionController
     private  lateinit var noLinearController: NoLinearController
+    private  lateinit var panningController: PanningController
 
     //Graficos
     @FXML
@@ -125,11 +128,12 @@ class BasicViewController {
         zoomController = ZoomController()
         controllerConvolution = ConvolutionController()
         noLinearController = NoLinearController()
+        panningController = PanningController()
         //Controladores de Imagen, Gráficos e Información
         chartController = ChartStateController(histogramChart, toneCurveChart, perfilAreaChart)
         dataController = DataStateController(dimImage, colorsImage, bppImage)
         imageController = ImageStateController(stage,applicationConsole, mainImageView,
-            chartController, dataController, zoomController, rotationController)
+            chartController, dataController, zoomController, rotationController, panningController)
         //Leer Imagen Inicial y crea una copia
         matrixImage = imageController.loadNewImage()
         matrixImage?: return
@@ -457,6 +461,32 @@ class BasicViewController {
         currentZoomLevel = 0
         currentZoomMethod = "NONE"
         imageController.updateZoom(currentZoomLevel, currentZoomMethod)
+        imageController.changeView(matrixImage!!)
+    }
+    //Panning
+    @FXML
+    fun onPanningClick(event: ActionEvent) {
+        matrixImage?:return
+        imageController.saveToHistory(matrixImage!!)
+        val dir = (event.source as Button).id
+        when (dir) {
+            "u" -> {
+                    matrixImage!!.currentPanningLevelY0 += 5
+                    matrixImage!!.currentPanningLevelY1 += 5
+            }
+            "d" -> {
+                    matrixImage!!.currentPanningLevelY1 -= 5
+                    matrixImage!!.currentPanningLevelY0 -= 5
+            }
+            "l" -> {
+                matrixImage!!.currentPanningLevelX0 += 5
+                matrixImage!!.currentPanningLevelX1 += 5
+            }
+            "r" -> {
+                matrixImage!!.currentPanningLevelX1 -= 5
+                matrixImage!!.currentPanningLevelX0 -= 5
+            }
+        }
         imageController.changeView(matrixImage!!)
     }
     //Convoluciones

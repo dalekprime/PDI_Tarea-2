@@ -108,7 +108,7 @@
                                             <tooltip><Tooltip text="Rotar -5°" /></tooltip>
                                         </Button>
 
-                                        <Button maxHeight="Infinity" maxWidth="Infinity" styleClass="icon-button" GridPane.columnIndex="1" GridPane.rowIndex="0">
+                                        <Button fx:id="u" maxHeight="Infinity" maxWidth="Infinity" onAction="#onPanningClick" styleClass="icon-button" GridPane.columnIndex="1" GridPane.rowIndex="0">
                                             <graphic>
                                                 <SVGPath content="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z" scaleX="0.7" scaleY="0.7" styleClass="icon-svg" />
                                             </graphic>
@@ -121,7 +121,7 @@
                                             <tooltip><Tooltip text="Rotar +5°" /></tooltip>
                                         </Button>
 
-                                        <Button maxHeight="Infinity" maxWidth="Infinity" styleClass="icon-button" GridPane.columnIndex="0" GridPane.rowIndex="1">
+                                        <Button fx:id="l" maxHeight="Infinity" maxWidth="Infinity" onAction="#onPanningClick" styleClass="icon-button" GridPane.columnIndex="0" GridPane.rowIndex="1">
                                             <graphic>
                                                 <SVGPath content="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6z" scaleX="0.7" scaleY="0.7" styleClass="icon-svg" />
                                             </graphic>
@@ -134,7 +134,7 @@
                                             <tooltip><Tooltip text="Girar 180°" /></tooltip>
                                         </Button>
 
-                                        <Button maxHeight="Infinity" maxWidth="Infinity" styleClass="icon-button" GridPane.columnIndex="2" GridPane.rowIndex="1">
+                                        <Button fx:id="r" maxHeight="Infinity" maxWidth="Infinity" onAction="#onPanningClick" styleClass="icon-button" GridPane.columnIndex="2" GridPane.rowIndex="1">
                                             <graphic>
                                                 <SVGPath content="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6z" scaleX="0.7" scaleY="0.7" styleClass="icon-svg" />
                                             </graphic>
@@ -147,7 +147,7 @@
                                             <tooltip><Tooltip text="Espejo Horizontal" /></tooltip>
                                         </Button>
 
-                                        <Button maxHeight="Infinity" maxWidth="Infinity" styleClass="icon-button" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                                        <Button fx:id="d" maxHeight="Infinity" maxWidth="Infinity" onAction="#onPanningClick" styleClass="icon-button" GridPane.columnIndex="1" GridPane.rowIndex="2">
                                             <graphic>
                                                 <SVGPath content="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6z" scaleX="0.7" scaleY="0.7" styleClass="icon-svg" />
                                             </graphic>
