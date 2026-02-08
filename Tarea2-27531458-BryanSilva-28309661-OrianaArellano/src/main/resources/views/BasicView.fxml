@@ -43,7 +43,7 @@
                         <MenuItem mnemonicParsing="false" onAction="#onLoadImageClick" text="Abrir Imagen" />
                         <MenuItem mnemonicParsing="false" onAction="#onDownLoadPNG" text="Guardar como PNG" />
                         <MenuItem mnemonicParsing="false" onAction="#onDownLoadBMP" text="Guardar como BMP" />
-                  <MenuItem mnemonicParsing="false" onAction="#onDownLoadJPG" text="Guardar como JPG" />
+                        <MenuItem mnemonicParsing="false" onAction="#onDownLoadJPG" text="Guardar como JPG" />
                         <MenuItem mnemonicParsing="false" onAction="#onDownLoadNetpbm" text="Guardar como Netpbm" />
                         <MenuItem mnemonicParsing="false" onAction="#onDownLoadRLE" text="Guardar como RLE" />
                     </items>
@@ -221,6 +221,75 @@
                                                                 <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#onColorScalePickerClick" text="Aplicar Color Scale" />
                                                             </children>
                                                         </VBox>
+
+                                                        <Separator opacity="0.3" prefWidth="200.0" />
+
+                                                        <Label text="Ajuste de Color (HLS / WB)" textFill="WHITE">
+                                                            <font>
+                                                                <Font name="System Bold" size="14.0" />
+                                                            </font>
+                                                            <padding>
+                                                                <Insets bottom="5.0" />
+                                                            </padding>
+                                                        </Label>
+
+                                                        <VBox spacing="5.0" styleClass="panel-box">
+                                                            <Label text="HLS (Tono/Sat/Lum)" textFill="#bbbbbb">
+                                                                <font>
+                                                                    <Font name="System Bold" size="12.0" />
+                                                                </font>
+                                                            </Label>
+
+                                                            <Label text="Matiz (Hue)" textFill="#aaaaaa"/>
+                                                            <Slider fx:id="hueSlider" min="-180" max="180" value="0" blockIncrement="1"/>
+
+                                                            <Label text="Saturación" textFill="#aaaaaa"/>
+                                                            <Slider fx:id="satSlider" min="-100" max="100" value="0"/>
+
+                                                            <Label text="Luminosidad" textFill="#aaaaaa"/>
+                                                            <Slider fx:id="lumSlider" min="-100" max="100" value="0"/>
+
+                                                            <Button text="Aplicar Cambios HLS" onAction="#onApplyHLSClick" maxWidth="Infinity"/>
+
+                                                            <Separator opacity="0.1" prefWidth="200.0" />
+
+                                                            <Label text="Balance de Blancos (YUV)" textFill="#bbbbbb">
+                                                                <font>
+                                                                    <Font name="System Bold" size="12.0" />
+                                                                </font>
+                                                            </Label>
+
+                                                            <Label text="Temp. Color (Azul/Amarillo - U)" textFill="#aaaaaa"/>
+                                                            <Slider fx:id="wbUSlider" min="0.0" max="2.0" value="1.0" blockIncrement="0.1"/>
+
+                                                            <Label text="Tinte (Verde/Magenta - V)" textFill="#aaaaaa"/>
+                                                            <Slider fx:id="wbVSlider" min="0.0" max="2.0" value="1.0" blockIncrement="0.1"/>
+
+                                                            <Button text="Aplicar WB" onAction="#onApplyWBClick" maxWidth="Infinity"/>
+                                                        </VBox>
+
+                                                        <Separator opacity="0.3" prefWidth="200.0" />
+                                                        <Label text="Cuantización (Reducción Color)" textFill="WHITE">
+                                                            <font><Font name="System Bold" size="14.0" /></font>
+                                                            <padding><Insets bottom="5.0" /></padding>
+                                                        </Label>
+                                                        <VBox styleClass="panel-box" spacing="5">
+                                                            <Label text="Método:" textFill="#bbbbbb">
+                                                                <font><Font name="System Bold" size="12.0" /></font>
+                                                            </Label>
+                                                            <RadioButton text="Uniforme" selected="true" textFill="WHITE">
+                                                                <toggleGroup><ToggleGroup fx:id="quantMethodGroup"/></toggleGroup>
+                                                            </RadioButton>
+                                                            <RadioButton text="K-Means" textFill="WHITE" toggleGroup="$quantMethodGroup"/>
+                                                            <RadioButton text="Popularidad" textFill="WHITE" toggleGroup="$quantMethodGroup"/>
+
+                                                            <HBox alignment="CENTER_LEFT" spacing="5">
+                                                                <Label text="Niveles / K:" textFill="#aaaaaa"/>
+                                                                <Spinner fx:id="quantLevelSpinner" editable="true" prefWidth="80"/>
+                                                            </HBox>
+                                                            <Button text="Aplicar Reducción" onAction="#onQuantizeClick" maxWidth="Infinity"/>
+                                                        </VBox>
+
                                                     </children>
                                                     <padding>
                                                         <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
@@ -282,6 +351,21 @@
                                                                     </children>
                                                                 </HBox>
                                                                 <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#onMultiUmbralButtonClick" text="Aplicar Múltiple" />
+
+                                                                <Separator opacity="0.1" prefWidth="200.0" />
+                                                                <Label text="Automática" textFill="#aaaaaa" />
+                                                                <GridPane hgap="5" vgap="5">
+                                                                    <columnConstraints>
+                                                                        <ColumnConstraints hgrow="ALWAYS"/>
+                                                                        <ColumnConstraints hgrow="ALWAYS"/>
+                                                                    </columnConstraints>
+                                                                    <Button text="OTSU" onAction="#onAutoThresholdClick" GridPane.columnIndex="0" maxWidth="Infinity"/>
+                                                                    <Button text="ISODATA" onAction="#onAutoThresholdClick" GridPane.columnIndex="1" maxWidth="Infinity"/>
+                                                                    <rowConstraints>
+                                                                        <RowConstraints />
+                                                                    </rowConstraints>
+                                                                </GridPane>
+
                                                             </children>
                                                         </VBox>
                                                     </children>
@@ -462,6 +546,90 @@
                                         </ScrollPane>
                                     </content>
                                 </Tab>
+                                <Tab text="Matematica">
+                                    <content>
+                                        <ScrollPane fitToWidth="true" style="-fx-background: transparent;">
+                                            <content>
+                                                <VBox spacing="10.0" style="-fx-background-color: #3c3f41;">
+                                                    <children>
+
+                                                        <Label style="-fx-font-weight: bold;" text="Global" textFill="WHITE" />
+                                                        <VBox styleClass="panel-box">
+                                                            <Button maxWidth="Infinity" onAction="#onEqualizeClick" text="Ecualizar Histograma" />
+                                                        </VBox>
+
+                                                        <Separator opacity="0.3" />
+
+                                                        <Label style="-fx-font-weight: bold;" text="Morfología" textFill="WHITE" />
+                                                        <VBox spacing="5.0" styleClass="panel-box">
+                                                            <Label text="Elemento Estructurante:" textFill="#aaaaaa" />
+                                                            <HBox spacing="5">
+                                                                <RadioButton selected="true" text="Rect" textFill="WHITE">
+                                                                    <toggleGroup><ToggleGroup fx:id="morphKernelGroup" /></toggleGroup>
+                                                                </RadioButton>
+                                                                <RadioButton text="Cruz" textFill="WHITE" toggleGroup="$morphKernelGroup" />
+                                                                <RadioButton text="Elipse" textFill="WHITE" toggleGroup="$morphKernelGroup" />
+                                                            </HBox>
+                                                            <RadioButton text="Personalizado" textFill="WHITE" toggleGroup="$morphKernelGroup" />
+
+                                                            <HBox alignment="CENTER_LEFT" spacing="5">
+                                                                <Label text="Tamaño:" textFill="#aaaaaa" />
+                                                                <Spinner fx:id="morphSizeSpinner" prefWidth="70" />
+                                                            </HBox>
+
+                                                            <GridPane hgap="5" vgap="5">
+                                                                <Button maxWidth="Infinity" onAction="#onErodeClick" text="Erosión" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+                                                                <Button maxWidth="Infinity" onAction="#onDilateClick" text="Dilatación" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+                                                                <Button maxWidth="Infinity" onAction="#onOpenClick" text="Apertura" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+                                                                <Button maxWidth="Infinity" onAction="#onCloseClick" text="Cierre" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                                                                <columnConstraints>
+                                                                    <ColumnConstraints />
+                                                                    <ColumnConstraints />
+                                                                </columnConstraints>
+                                                                <rowConstraints>
+                                                                    <RowConstraints />
+                                                                    <RowConstraints />
+                                                                </rowConstraints>
+                                                            </GridPane>
+                                                        </VBox>
+
+                                                        <Separator opacity="0.3" />
+
+                                                        <Label style="-fx-font-weight: bold;" text="Crecimiento Regiones" textFill="WHITE" />
+                                                        <VBox spacing="5.0" styleClass="panel-box">
+
+                                                            <HBox spacing="10">
+                                                                <VBox>
+                                                                    <Label text="Rango:" textFill="#aaaaaa" />
+                                                                    <RadioButton selected="true" text="Fijo" textFill="WHITE">
+                                                                        <toggleGroup><ToggleGroup fx:id="segRangeGroup" /></toggleGroup>
+                                                                    </RadioButton>
+                                                                    <RadioButton text="Flotante" textFill="WHITE" toggleGroup="$segRangeGroup" />
+                                                                </VBox>
+                                                                <VBox>
+                                                                    <Label text="Vecindad:" textFill="#aaaaaa" />
+                                                                    <RadioButton selected="true" text="4" textFill="WHITE">
+                                                                        <toggleGroup><ToggleGroup fx:id="segConnectivityGroup" /></toggleGroup>
+                                                                    </RadioButton>
+                                                                    <RadioButton text="8" textFill="WHITE" toggleGroup="$segConnectivityGroup" />
+                                                                </VBox>
+                                                            </HBox>
+
+                                                            <HBox alignment="CENTER_LEFT" spacing="5">
+                                                                <Label text="Umbral:" textFill="#aaaaaa" />
+                                                                <TextField fx:id="segThresholdField" prefWidth="60" text="15" />
+                                                            </HBox>
+
+                                                            <ToggleButton fx:id="btnPickSeed" maxWidth="Infinity" style="-fx-base: #d81b60;" text="📍 Seleccionar Semilla" />
+                                                        </VBox>
+
+                                                    </children>
+                                                    <padding><Insets bottom="10" left="10" right="10" top="10" /></padding>
+                                                </VBox>
+                                            </content>
+                                        </ScrollPane>
+                                    </content>
+                                </Tab>
                             </tabs>
                         </TabPane>
                     </children>
@@ -469,7 +637,7 @@
 
                 <ScrollPane fitToHeight="true" fitToWidth="true" pannable="true" style="-fx-background-color: #1e1e1e;" HBox.hgrow="ALWAYS">
                     <content>
-                        <StackPane style="-fx-background-color: #1e1e1e;">
+                        <StackPane fx:id="imageStackPane" style="-fx-background-color: #1e1e1e;">
                             <children>
                                 <ImageView fx:id="mainImageView" pickOnBounds="true" preserveRatio="true" smooth="false" />
                                 <ImageView fx:id="mainImageView1" pickOnBounds="true" preserveRatio="true" smooth="false" />
@@ -575,9 +743,9 @@
                                     </graphic>
                                 </Button>
                             </children>
-                     <padding>
-                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-                     </padding>
+                            <padding>
+                                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                            </padding>
                         </VBox>
 
                         <Accordion fx:id="rightAccordion" style="-fx-background-color: #313335;" VBox.vgrow="ALWAYS">
