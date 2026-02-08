@@ -1,5 +1,6 @@
 package controllers
 
+import actions.RotationController
 import actions.ZoomController
 import javafx.scene.control.Label
 import javafx.scene.image.ImageView
@@ -28,8 +29,9 @@ class ImageStateController {
     private var chartController: ChartStateController
     private var dataController: DataStateController
 
-    //Referencia a Controlador de Zoom
+    //Referencia a Controladores de Transformacion
     private var zoomController: ZoomController
+    private var rotationController: RotationController
 
     //Imagen Inicial
     private lateinit var matrixImageOriginal: ImageMatrix
@@ -40,7 +42,7 @@ class ImageStateController {
 
     constructor(stage: Stage, label: Label, view: ImageView,
                 chartController: ChartStateController, dataController: DataStateController,
-                zoomController: ZoomController) {
+                zoomController: ZoomController, rotationController: RotationController) {
         this.stage = stage
         this.dataLabel = label
         this.imageView = view
@@ -49,6 +51,7 @@ class ImageStateController {
         this.undoStack = Stack()
         this.redoStack = Stack()
         this.zoomController = zoomController
+        this.rotationController = rotationController
     }
     fun loadNewImage(): ImageMatrix?{
         val fileChooser = FileChooser().apply{
@@ -83,19 +86,27 @@ class ImageStateController {
         this.currentZoomMethod = czm
     }
     fun changeView(imageMatrix: ImageMatrix){
-        //Calculo de Zoom
         var imageToShow: ImageMatrix = imageMatrix
-        if ( currentZoomLevel == 0){
+        //Calculo de Rotacion
+        if(imageMatrix.currentRotationLevel == 0.0){
             imageToShow = imageMatrix
         }
         else {
-            currentZoomLevel = abs(currentZoomLevel)
-            imageToShow = when(currentZoomMethod) {
-                "INN" -> zoomController.zoomINN(imageMatrix, currentZoomLevel)
-                "inBLI" -> zoomController.zoomInBLI(imageMatrix, currentZoomLevel)
-                "OutN" -> zoomController.zoomOutN(imageMatrix, currentZoomLevel)
-                "OutSuperS" -> zoomController.zoomOutSupersampling(imageMatrix, currentZoomLevel)
+            imageToShow = when(imageMatrix.currentRotationMethod) {
+                "EX" -> rotationController.rotationEX(imageMatrix, imageMatrix.currentRotationLevel)
+                "NOEX" -> rotationController.rotationNoEX(imageMatrix, imageMatrix.currentRotationLevel)
                 else -> imageMatrix
+            }
+        }
+        //Calculo de Zoom
+        if (currentZoomLevel != 0) {
+            val currentZoomLevelAbs = abs(currentZoomLevel)
+            imageToShow = when(currentZoomMethod) {
+                "INN" -> zoomController.zoomINN(imageToShow, currentZoomLevelAbs)
+                "inBLI" -> zoomController.zoomInBLI(imageToShow, currentZoomLevelAbs)
+                "OutN" -> zoomController.zoomOutN(imageToShow, currentZoomLevelAbs)
+                "OutSuperS" -> zoomController.zoomOutSupersampling(imageToShow, currentZoomLevelAbs)
+                else -> imageToShow
             }
         }
         //Imagen

@@ -15,6 +15,6 @@ class NoLinearController {
         }
         if (kSize < 1) kSize = 1
         Imgproc.medianBlur(src, dest, kSize)
-        return ImageMatrix(dest)
+        return ImageMatrix(dest, imageMatrix)
     }
 }

@@ -128,7 +128,8 @@ class BasicViewController {
         //Controladores de Imagen, Gráficos e Información
         chartController = ChartStateController(histogramChart, toneCurveChart, perfilAreaChart)
         dataController = DataStateController(dimImage, colorsImage, bppImage)
-        imageController = ImageStateController(stage,applicationConsole, mainImageView, chartController, dataController, zoomController)
+        imageController = ImageStateController(stage,applicationConsole, mainImageView,
+            chartController, dataController, zoomController, rotationController)
         //Leer Imagen Inicial y crea una copia
         matrixImage = imageController.loadNewImage()
         matrixImage?: return
@@ -244,21 +245,21 @@ class BasicViewController {
         lightSlider.valueProperty().addListener { _, _, newValue ->
             if (matrixImage != null) {
                 val previewImage = ligthController.brightness(matrixImage!!, newValue.toDouble())
-                mainImageView.image = previewImage.matrixToImage()
+                imageController.changeView(previewImage)
             }
         }
         //Contraste en Tiempo Real
         contrastSlider.valueProperty().addListener { _, _, newValue ->
             if (matrixImage != null) {
                 val previewImage = ligthController.contrast(matrixImage!!, newValue.toDouble())
-                mainImageView.image = previewImage.matrixToImage()
+                imageController.changeView(previewImage)
             }
         }
         //Umbral Simple en Tiempo Real
         umbralSlider.valueProperty().addListener { _, _, newValue ->
             if (matrixImage != null) {
                 val previewImage = umbralizerController.simpleUmbral(matrixImage!!, umbralSlider.value)
-                mainImageView.image = previewImage.matrixToImage()
+                imageController.changeView(previewImage)
             }
         }
     }
@@ -354,24 +355,36 @@ class BasicViewController {
         matrixImage = rotationController.mirrorV(matrixImage!!)
         imageController.changeView(matrixImage!!)
     }
+    //Rotation
+    @FXML
+    private lateinit var rotationModeGroup: ToggleGroup
+    //Update Rotacion Method
+    @FXML
+    fun onUpdateRotationMethodClick(event: ActionEvent) {
+        matrixImage?:return
+        val selection = (rotationModeGroup.selectedToggle as RadioButton).text
+        val method = when (selection) {
+            "Recortar" -> "NOEX"
+            "Expandir" -> "EX"
+            else -> "NOEX"
+        }
+        matrixImage!!.currentRotationMethod = method
+        imageController.changeView(matrixImage!!)
+    }
     //Rotacion Clockwise
     @FXML
     fun onRotationClockClick(event: ActionEvent) {
         matrixImage?:return
-        originalGeometryImage = rotationController.rotation(originalGeometryImage!!, -5.0)
-        imageController.changeOriginalRotatedOrZoom(originalGeometryImage!!)
         imageController.saveToHistory(matrixImage!!)
-        matrixImage = rotationController.rotation(matrixImage!!, -5.0)
+        matrixImage!!.currentRotationLevel -= 5.0
         imageController.changeView(matrixImage!!)
     }
     //Rotacion AntiClockwise
     @FXML
     fun onRotationClockAntiClick(event: ActionEvent) {
         matrixImage?:return
-        originalGeometryImage = rotationController.rotation(originalGeometryImage!!, +5.0)
-        imageController.changeOriginalRotatedOrZoom(originalGeometryImage!!)
         imageController.saveToHistory(matrixImage!!)
-        matrixImage = rotationController.rotation(matrixImage!!, +5.0)
+        matrixImage!!.currentRotationLevel += 5.0
         imageController.changeView(matrixImage!!)
     }
     //Rotacion 180 grados
@@ -538,7 +551,7 @@ class BasicViewController {
             0.0,
             dest
         )
-        val newImage = ImageMatrix(dest)
+        val newImage = ImageMatrix(dest, matrixImage!!)
         matrixImage = newImage
         imageController.changeView(newImage)
     }
@@ -723,7 +736,7 @@ class BasicViewController {
         gxFloat.release()
         gyFloat.release()
         magnitude.release()
-        return ImageMatrix(result)
+        return ImageMatrix(result, matrixImage!!)
     }
     fun calculateAngles(gx: ImageMatrix, gy: ImageMatrix): ImageMatrix {
         val gxFloat = Mat()
@@ -739,7 +752,7 @@ class BasicViewController {
         gxFloat.release()
         gyFloat.release()
         angles.release()
-        return ImageMatrix(result)
+        return ImageMatrix(result, matrixImage!!)
     }
 
 }

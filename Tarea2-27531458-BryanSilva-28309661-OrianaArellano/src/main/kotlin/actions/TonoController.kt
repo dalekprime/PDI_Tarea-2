@@ -25,7 +25,7 @@ class TonoController {
         } else {
             Imgproc.cvtColor(imageMatrix.image, newImage, Imgproc.COLOR_BGR2GRAY)
         }
-        return ImageMatrix(newImage);
+        return ImageMatrix(newImage, imageMatrix);
     }
     //Escala de Color
     fun colorScale(imageMatrix: ImageMatrix, colorScalePicker: ColorPicker): ImageMatrix {
@@ -66,6 +66,6 @@ class TonoController {
         Core.LUT(src3Channels, lut, resultMat)
         src3Channels.release()
         lut.release()
-        return ImageMatrix(resultMat);
+        return ImageMatrix(resultMat, imageMatrix);
     }
 }

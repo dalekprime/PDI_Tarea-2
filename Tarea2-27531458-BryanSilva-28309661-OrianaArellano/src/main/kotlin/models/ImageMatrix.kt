@@ -14,8 +14,17 @@ import java.io.StreamTokenizer
 
 class ImageMatrix {
     var image: Mat
-    constructor(content: Mat){
+    var currentRotationLevel: Double
+    var currentRotationMethod: String
+    constructor(content: Mat) {
         image = content
+        currentRotationLevel = 0.0
+        currentRotationMethod = "NOEX"
+    }
+    constructor(content: Mat, oldImage: ImageMatrix) {
+        image = content
+        currentRotationLevel = oldImage.currentRotationLevel
+        currentRotationMethod = oldImage.currentRotationMethod
     }
     constructor(file: File){
         if (file.extension.equals("rle", ignoreCase = true)) {
@@ -26,6 +35,8 @@ class ImageMatrix {
         if (image.empty()) {
             throw Exception("No se pudo cargar la imagen: ${file.absolutePath}")
         }
+        currentRotationLevel = 0.0
+        currentRotationMethod = "NOEX"
     }
     private fun loadFromRLE(file: File): Mat {
         val reader = BufferedReader(FileReader(file))
@@ -140,6 +151,8 @@ class ImageMatrix {
     };
     fun copy() : ImageMatrix{
         val newMatrix = ImageMatrix(image.clone())
+        newMatrix.currentRotationLevel = currentRotationLevel
+        newMatrix.currentRotationMethod = currentRotationMethod
         return newMatrix
     }
 }

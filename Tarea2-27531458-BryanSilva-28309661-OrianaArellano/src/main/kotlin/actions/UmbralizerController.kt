@@ -23,7 +23,7 @@ class UmbralizerController {
         val binaryMat = Mat()
         Imgproc.threshold(grayMat, binaryMat, t, 255.0, Imgproc.THRESH_BINARY)
         grayMat.release()
-        return ImageMatrix(binaryMat)
+        return ImageMatrix(binaryMat, imageMatrix)
     }
     //Umbral Multiple
     fun multiUmbral(imageMatrix: ImageMatrix, thresholdInf: Number, thresholdSup: Number): ImageMatrix {
@@ -42,6 +42,6 @@ class UmbralizerController {
         val binaryMat = Mat()
         Core.inRange(grayMat, Scalar(t1), Scalar(t2), binaryMat)
         grayMat.release()
-        return ImageMatrix(binaryMat)
+        return ImageMatrix(binaryMat, imageMatrix)
     }
 }

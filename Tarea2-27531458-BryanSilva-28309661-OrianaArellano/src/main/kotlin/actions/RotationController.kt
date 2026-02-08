@@ -24,7 +24,7 @@ class RotationController {
         return newImage;
     }
     //Rotacion
-    fun rotation(imageMatrix: ImageMatrix, angle: Double): ImageMatrix {
+    fun rotationEX(imageMatrix: ImageMatrix, angle: Double): ImageMatrix {
         val src = imageMatrix.image
         val radians = Math.toRadians(angle)
         val sin = abs(kotlin.math.sin(radians))
@@ -43,7 +43,20 @@ class RotationController {
             Size(newWidth.toDouble(), newHeight.toDouble()),
             Imgproc.INTER_LINEAR,
             Core.BORDER_CONSTANT,
-            Scalar(0.0, 0.0, 0.0, 0.0) // Fondo transparente/negro
+            Scalar(0.0, 0.0, 0.0, 0.0)
+        )
+        rotationMat.release()
+        return ImageMatrix(dest)
+    }
+    fun rotationNoEX(imageMatrix: ImageMatrix, angle: Double): ImageMatrix {
+        val src = imageMatrix.image
+        val center = Point(src.width() / 2.0, src.height() / 2.0)
+        val rotationMat = Imgproc.getRotationMatrix2D(center, angle, 1.0)
+        val dest = Mat()
+        Imgproc.warpAffine(
+            src, dest, rotationMat,
+            src.size(),
+            Imgproc.INTER_LINEAR, Core.BORDER_CONSTANT, Scalar(0.0, 0.0, 0.0, 0.0)
         )
         rotationMat.release()
         return ImageMatrix(dest)

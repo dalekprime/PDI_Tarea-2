@@ -32,6 +32,6 @@ class ZoomController {
         val newWidth = (src.cols() * scale).toInt()
         val newHeight = (src.rows() * scale).toInt()
         Imgproc.resize(src, dst, Size(newWidth.toDouble(), newHeight.toDouble()), 0.0, 0.0, interpolation)
-        return ImageMatrix(dst)
+        return ImageMatrix(dst, imageMatrix)
     }
 }

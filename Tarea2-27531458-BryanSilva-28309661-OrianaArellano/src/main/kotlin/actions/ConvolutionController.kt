@@ -31,6 +31,6 @@ class ConvolutionController {
             Core.BORDER_REPLICATE
         )
         kernelMat.release()
-        return ImageMatrix(dst)
+        return ImageMatrix(dst, imageMatrix)
     }
 }
