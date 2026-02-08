@@ -97,12 +97,13 @@ class ImageStateController {
             imageToShow.currentPanningLevelX1 != imageToShow.image.width().toDouble() ||
             imageToShow.currentPanningLevelY1 != imageToShow.image.height().toDouble()) {
             imageToShow = when (imageMatrix.currentPanningMethod) {
-                "EX" -> panningController.panningNOEX(imageToShow, imageToShow.currentPanningLevelX0,
+                "EX" -> panningController.panningEX(imageToShow, imageToShow.currentPanningLevelX0,
                     imageToShow.currentPanningLevelY0, imageToShow.currentPanningLevelX1,
                     imageToShow.currentPanningLevelY1)
                 "NOEX" -> panningController.panningNOEX(imageToShow, imageToShow.currentPanningLevelX0,
                     imageToShow.currentPanningLevelY0, imageToShow.currentPanningLevelX1,
                     imageToShow.currentPanningLevelY1)
+                "EXLL" -> panningController.panningEXLL(imageToShow)
                 else -> imageMatrix
             }
         }

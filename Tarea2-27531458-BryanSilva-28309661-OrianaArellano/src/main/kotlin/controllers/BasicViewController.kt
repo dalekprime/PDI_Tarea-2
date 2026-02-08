@@ -465,6 +465,21 @@ class BasicViewController {
     }
     //Panning
     @FXML
+    private lateinit var panningModeGroup: ToggleGroup
+    @FXML
+    fun onUpdatePanningMethodClick(event: ActionEvent) {
+        matrixImage ?: return
+        val selection = (panningModeGroup.selectedToggle as RadioButton).text
+        val method = when (selection) {
+            "Recortar" -> "NOEX"
+            "Expandir" -> "EX"
+            "Llenado" -> "EXLL"
+            else -> "NOEX"
+        }
+        matrixImage!!.currentPanningMethod = method
+        imageController.changeView(matrixImage!!)
+    }
+    @FXML
     fun onPanningClick(event: ActionEvent) {
         matrixImage?:return
         imageController.saveToHistory(matrixImage!!)
