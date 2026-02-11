@@ -80,7 +80,7 @@ class BasicViewController {
     private lateinit var morphologyController: MorphologyController
     private lateinit var segmentationController: SegmentationController
     private lateinit var quantizationController: QuantizationController
-    private lateinit var frequencyController: actions.FrequencyController
+    private lateinit var frequencyController: FrequencyController
 
     //Graficos
     @FXML
