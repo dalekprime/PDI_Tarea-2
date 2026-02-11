@@ -706,19 +706,9 @@ class BasicViewController {
 
     private fun aplicarPerfilado(kernel: Kernel) {
         matrixImage ?: return
-        val convolutionController = ConvolutionController()
-        val laplacianImage = convolutionController.apply(matrixImage!!, kernel)
-        val dest = Mat()
-        val alpha = 1.0
-        Core.addWeighted(
-            matrixImage!!.image, 1.0,
-            laplacianImage.image, alpha,
-            0.0,
-            dest
-        )
-        val newImage = ImageMatrix(dest, matrixImage!!)
-        matrixImage = newImage
-        imageController.changeView(newImage)
+        val resultImage = ConvolutionController().apply(matrixImage!!, kernel)
+        matrixImage = resultImage
+        imageController.changeView(matrixImage!!)
     }
 
     @FXML
@@ -744,8 +734,6 @@ class BasicViewController {
     @FXML
     lateinit var orientationGroupRoberts: ToggleGroup
 
-    private var lastFilter: Int = 0 // 0 = ninguno, 1 = Sobel, 2 = Prewitt, 3 = Roberts
-
     @FXML
     fun onApplyRobertsClick(event: ActionEvent) {
         matrixImage ?: return
@@ -755,7 +743,6 @@ class BasicViewController {
         val result = ConvolutionController().apply(matrixImage!!, kernel)
         matrixImage = result
         imageController.changeView(matrixImage!!)
-        lastFilter = 3
     }
 
     @FXML
@@ -784,7 +771,6 @@ class BasicViewController {
         val result = ConvolutionController().apply(matrixImage!!, kernel)
         matrixImage = result
         imageController.changeView(matrixImage!!)
-        lastFilter = 1
     }
 
     @FXML
@@ -813,7 +799,6 @@ class BasicViewController {
         val result = ConvolutionController().apply(matrixImage!!, kernel)
         matrixImage = result
         imageController.changeView(matrixImage!!)
-        lastFilter = 2
     }
 
     @FXML
@@ -1001,9 +986,9 @@ class BasicViewController {
 
     //Regiones
     @FXML
-    lateinit var segConnectivityGroup: ToggleGroup // 4 u 8
+    lateinit var segConnectivityGroup: ToggleGroup
     @FXML
-    lateinit var segRangeGroup: ToggleGroup // Fijo o Flotante
+    lateinit var segRangeGroup: ToggleGroup
     @FXML
     lateinit var segThresholdField: TextField
     @FXML
@@ -1024,7 +1009,6 @@ class BasicViewController {
                 val yScale = imageH / bounds.height
                 val seedX = (localPoint.x * xScale).toInt().coerceIn(0, matrixImage!!.image.cols() - 1)
                 val seedY = (localPoint.y * yScale).toInt().coerceIn(0, matrixImage!!.image.rows() - 1)
-                println("Semilla detectada: $seedX, $seedY")
                 executeRegionGrowing(seedX, seedY)
                 btnPickSeed.isSelected = false
             }
@@ -1044,7 +1028,6 @@ class BasicViewController {
             connectivity
         )
         imageController.changeView(matrixImage!!)
-        applicationConsole.text = "Segmentación completada."
     }
 
     //Ajuste de Tono y Blancos

@@ -5,28 +5,43 @@ import org.opencv.core.Core
 import org.opencv.core.CvType
 import org.opencv.core.Mat
 import org.opencv.core.TermCriteria
+import org.opencv.imgproc.Imgproc
 import java.util.PriorityQueue
+import kotlin.math.floor
 
 class QuantizationController {
+
+    private fun ensureBGR(imageMatrix: Mat): Mat {
+        val bgr = Mat()
+        if (imageMatrix.channels() == 4) {
+            Imgproc.cvtColor(imageMatrix, bgr, Imgproc.COLOR_BGRA2BGR)
+        } else {
+            imageMatrix.copyTo(bgr)
+        }
+        return bgr
+    }
+
     fun applyUniform(imageMatrix: ImageMatrix, levels: Int): ImageMatrix {
-        val src = imageMatrix.image
+        val src = ensureBGR(imageMatrix.image)
         val dst = Mat()
-        val div = 256.0 / levels
+        val safeLevels = if (levels < 2) 2 else levels
+        val div = 256.0 / safeLevels
         val lut = Mat(1, 256, CvType.CV_8U)
         val data = ByteArray(256)
         for (i in 0..255) {
-            var newVal = (Math.floor(i / div) * div + (div / 2.0)).toInt()
+            var newVal = (floor(i / div) * div + (div / 2.0)).toInt()
             if (newVal > 255) newVal = 255
             data[i] = newVal.toByte()
         }
         lut.put(0, 0, data)
         Core.LUT(src, lut, dst)
         lut.release()
+        src.release()
         return ImageMatrix(dst, imageMatrix)
     }
 
     fun applyKMeans(imageMatrix: ImageMatrix, k: Int): ImageMatrix {
-        val src = imageMatrix.image
+        val src = ensureBGR(imageMatrix.image)
         val samples = src.reshape(1, src.rows() * src.cols())
         val samples32f = Mat()
         samples.convertTo(samples32f, CvType.CV_32F)
@@ -38,7 +53,7 @@ class QuantizationController {
             k,
             labels,
             criteria,
-            3, // Intentos
+            3,
             Core.KMEANS_PP_CENTERS,
             centers
         )
@@ -65,11 +80,13 @@ class QuantizationController {
         samples32f.release()
         labels.release()
         centers.release()
+        centers8u.release()
+        src.release()
         return ImageMatrix(dst, imageMatrix)
     }
 
     fun applyPopularity(imageMatrix: ImageMatrix, k: Int): ImageMatrix {
-        val src = imageMatrix.image
+        val src = ensureBGR(imageMatrix.image)
         val width = src.width()
         val height = src.height()
         val colorCounts = HashMap<Int, Int>()
@@ -126,6 +143,7 @@ class QuantizationController {
             outBuffer[i+2] = palR[bestIdx].toByte()
         }
         dst.put(0, 0, outBuffer)
+        src.release()
         return ImageMatrix(dst, imageMatrix)
     }
 }

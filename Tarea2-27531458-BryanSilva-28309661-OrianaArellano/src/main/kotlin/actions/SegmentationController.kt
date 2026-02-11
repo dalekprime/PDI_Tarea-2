@@ -15,10 +15,15 @@ class SegmentationController {
         seedY: Int,
         threshold: Double,
         isFixedRange: Boolean,
-        // 4 u 8
         connectivity: Int
     ): ImageMatrix {
-        val src = imageMatrix.image
+        var src = imageMatrix.image.clone()
+        if (src.channels() == 4) {
+            val bgr = Mat()
+            Imgproc.cvtColor(src, bgr, Imgproc.COLOR_BGRA2BGR)
+            src.release()
+            src = bgr
+        }
         val mask = Mat(src.rows() + 2, src.cols() + 2, CvType.CV_8UC1, Scalar.all(0.0))
         val lowerDiff = Scalar.all(threshold)
         val upperDiff = Scalar.all(threshold)

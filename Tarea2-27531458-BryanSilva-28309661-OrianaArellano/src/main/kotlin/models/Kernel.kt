@@ -73,7 +73,7 @@ class Kernel {
         val k = Kernel(3,3)
         k.matrix = arrayOf(
             arrayOf(0.0, -1.0, 0.0),
-            arrayOf(-1.0, 4.0, -1.0),
+            arrayOf(-1.0, 5.0, -1.0),
             arrayOf(0.0, -1.0, 0.0)
         )
         return k
@@ -82,7 +82,7 @@ class Kernel {
         val k = Kernel(3,3)
         k.matrix = arrayOf(
             arrayOf(-1.0, -1.0, -1.0),
-            arrayOf(-1.0, 8.0, -1.0),
+            arrayOf(-1.0, 9.0, -1.0),
             arrayOf(-1.0, -1.0, -1.0)
         )
         return k
