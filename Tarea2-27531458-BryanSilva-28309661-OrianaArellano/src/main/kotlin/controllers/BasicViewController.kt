@@ -11,7 +11,6 @@ import actions.SegmentationController
 import actions.UmbralizerController
 import actions.TonoController
 import actions.ZoomController
-import actions.FrequencyController
 import javafx.event.ActionEvent
 import javafx.fxml.FXML
 import javafx.scene.chart.AreaChart
@@ -80,7 +79,6 @@ class BasicViewController {
     private lateinit var morphologyController: MorphologyController
     private lateinit var segmentationController: SegmentationController
     private lateinit var quantizationController: QuantizationController
-    private lateinit var frequencyController: actions.FrequencyController
 
     //Graficos
     @FXML
@@ -155,7 +153,6 @@ class BasicViewController {
         morphologyController = MorphologyController()
         segmentationController = SegmentationController()
         quantizationController = QuantizationController()
-        frequencyController = FrequencyController()
         //Controladores de Imagen, Gráficos e Información
         chartController = ChartStateController(histogramChart, toneCurveChart, perfilAreaChart)
         dataController = DataStateController(dimImage, colorsImage, bppImage)
@@ -261,11 +258,11 @@ class BasicViewController {
         rowsSpinnerPrewitt.valueFactory = SpinnerValueFactory.IntegerSpinnerValueFactory(1, 7, 3)
         colsSpinnerPrewitt.valueFactory = SpinnerValueFactory.IntegerSpinnerValueFactory(1, 7, 3)
 
-        morphSizeSpinner.valueFactory = SpinnerValueFactory.IntegerSpinnerValueFactory(3, 21, 3, 2)
+        morphSizeSpinner.valueFactory = SpinnerValueFactory.IntegerSpinnerValueFactory(1, 21, 3, 2)
         setupSeedClicking()
 
         quantLevelSpinner.valueFactory = SpinnerValueFactory.IntegerSpinnerValueFactory(2, 256, 8)
-        
+
         // Validación cruzada para Sobel
         rowsSpinnerSobel.valueProperty().addListener { _, _, newValue ->
             if (newValue == 1 && colsSpinnerSobel.value == 1) {
@@ -1125,116 +1122,6 @@ class BasicViewController {
             "Popularidad" -> quantizationController.applyPopularity(matrixImage!!, k)
             else -> matrixImage
         }
-        imageController.changeView(matrixImage!!)
-    }
-
-    fun onapplyDFTClick(event: ActionEvent) {
-        matrixImage ?: return
-        imageController.saveToHistory(matrixImage!!)
-        matrixImage = frequencyController.applyDFT(matrixImage!!)
-        imageController.changeView(matrixImage!!)
-    }
-
-    @FXML lateinit var dftRadiusSlider: Slider
-    @FXML lateinit var dctThresholdSlider: Slider
-    @FXML lateinit var wienerNoiseSlider: Slider
-    @FXML lateinit var wienerKernelSpinner: Spinner<Int>
-
-    // -----------------------------------------------------------
-    // FUNCIONES DE FOURIER (DFT) - Tarea y 09
-    // -----------------------------------------------------------
-
-    /*
-    @FXML
-    fun onApplyLowPassDFT(event: ActionEvent) {
-        matrixImage ?: return
-        imageController.saveToHistory(matrixImage!!)
-        // Tarea 09: Filtro Paso Bajo (DFT)
-        val radius = dftRadiusSlider.value
-        matrixImage = frequencyController.applyLowStep(matrixImage!!, radius)
-        imageController.changeView(matrixImage!!)
-    }
-
-    @FXML
-    fun onApplyHighPassDFT(event: ActionEvent) {
-        matrixImage ?: return
-        imageController.saveToHistory(matrixImage!!)
-        // Tarea 09: Filtro Paso Alto (DFT)
-        val radius = dftRadiusSlider.value
-        matrixImage = frequencyController.applyHighStep(matrixImage!!, radius)
-        imageController.changeView(matrixImage!!)
-    }
-
-    */
-    @FXML
-    fun onShowDCTSpectrum(event: ActionEvent) {
-        matrixImage ?: return
-        imageController.saveToHistory(matrixImage!!)
-        // Tarea 13: Ver espectro DCT
-        matrixImage = frequencyController.applyDCT(matrixImage!!)
-        imageController.changeView(matrixImage!!)
-    }
-
-    @FXML
-    fun onApplyLowPassDFT(event: ActionEvent) { // O onApplyLowPassClick
-        matrixImage ?: return
-        imageController.saveToHistory(matrixImage!!)
-        val radius = dftRadiusSlider.value
-        // Llama a la nueva función
-        matrixImage = frequencyController.applyDFTFilterCommon(matrixImage!!, radius, true)
-        imageController.changeView(matrixImage!!)
-    }
-
-    @FXML
-    fun onApplyHighPassDFT(event: ActionEvent) { // O onApplyHighPassClick
-        matrixImage ?: return
-        imageController.saveToHistory(matrixImage!!)
-        val radius = dftRadiusSlider.value
-        // Llama a la nueva función
-        matrixImage = frequencyController.applyDFTFilterCommon(matrixImage!!, radius, false)
-        imageController.changeView(matrixImage!!)
-    }
-
-
-    @FXML
-    fun onApplyLowPassDCT(event: ActionEvent) {
-        matrixImage ?: return
-        imageController.saveToHistory(matrixImage!!)
-
-        val threshold = dctThresholdSlider.value
-
-        // CORREGIDO: Llamar a applyDCTFilter
-        matrixImage = frequencyController.applyDCTFilter(matrixImage!!, threshold, true)
-
-        imageController.changeView(matrixImage!!)
-    }
-
-    @FXML
-    fun onApplyHighPassDCT(event: ActionEvent) {
-        matrixImage ?: return
-        imageController.saveToHistory(matrixImage!!)
-
-        val threshold = dctThresholdSlider.value
-
-        // CORREGIDO: Llamar a applyDCTFilter
-        matrixImage = frequencyController.applyDCTFilter(matrixImage!!, threshold, false)
-
-        imageController.changeView(matrixImage!!)
-    }
-    @FXML
-    fun onApplyWiener(event: ActionEvent) {
-        matrixImage ?: return
-        imageController.saveToHistory(matrixImage!!)
-
-        val noise = wienerNoiseSlider.value
-        // Forzamos a entero por si acaso
-        val kernel = wienerKernelSpinner.value.toString().toInt()
-
-        // --- CORRECCIÓN AQUÍ ---
-        // Antes: frequencyController.applyWiener(...)  <-- ERROR
-        // Ahora: nonLinearController.applyWiener(...)  <-- CORRECTO
-        matrixImage = noLinearController.applyWiener(matrixImage!!, kernel, noise)
-
         imageController.changeView(matrixImage!!)
     }
 }
