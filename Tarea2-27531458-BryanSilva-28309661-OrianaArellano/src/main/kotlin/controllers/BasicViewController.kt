@@ -258,11 +258,11 @@ class BasicViewController {
         rowsSpinnerPrewitt.valueFactory = SpinnerValueFactory.IntegerSpinnerValueFactory(1, 7, 3)
         colsSpinnerPrewitt.valueFactory = SpinnerValueFactory.IntegerSpinnerValueFactory(1, 7, 3)
 
-        morphSizeSpinner.valueFactory = SpinnerValueFactory.IntegerSpinnerValueFactory(3, 21, 3, 2)
+        morphSizeSpinner.valueFactory = SpinnerValueFactory.IntegerSpinnerValueFactory(1, 21, 3, 2)
         setupSeedClicking()
 
         quantLevelSpinner.valueFactory = SpinnerValueFactory.IntegerSpinnerValueFactory(2, 256, 8)
-        
+
         // Validación cruzada para Sobel
         rowsSpinnerSobel.valueProperty().addListener { _, _, newValue ->
             if (newValue == 1 && colsSpinnerSobel.value == 1) {
