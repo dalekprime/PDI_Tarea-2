@@ -11,9 +11,17 @@ import org.opencv.imgproc.Imgproc
 class TonoController {
     //Negativo
     fun negativeImage(imageMatrix: ImageMatrix): ImageMatrix {
-        val newImage = imageMatrix.copy()
-        Core.bitwise_not(imageMatrix.image, newImage.image)
-        return newImage;
+        var src = imageMatrix.image.clone()
+        if (src.channels() == 4) {
+            val bgr = Mat()
+            Imgproc.cvtColor(src, bgr, Imgproc.COLOR_BGRA2BGR)
+            src.release()
+            src = bgr
+        }
+        val dst = Mat()
+        Core.bitwise_not(src, dst)
+        src.release()
+        return ImageMatrix(dst, imageMatrix)
     }
     //Escala de Grises
     fun greyScale(imageMatrix: ImageMatrix): ImageMatrix {

@@ -16,7 +16,7 @@ import java.util.Stack
 import kotlin.math.abs
 
 class ImageStateController {
-    private val maxHistorySize = 5
+    private val maxHistorySize = 6
     //Pilas de Control de Version
     private var undoStack: Stack<ImageMatrix>
     private var redoStack: Stack<ImageMatrix>

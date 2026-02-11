@@ -90,4 +90,5 @@ class UmbralizerController {
         gray.release()
         return ImageMatrix(dst, imageMatrix)
     }
+
 }

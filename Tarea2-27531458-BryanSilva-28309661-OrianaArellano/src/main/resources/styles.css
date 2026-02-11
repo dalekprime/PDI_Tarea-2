@@ -1,4 +1,3 @@
-/*ESTILOS GENERALES Y CONTENEDORES*/
 .root {
     -fx-base: #2b2b2b;
     -fx-background: #2b2b2b;
@@ -10,23 +9,24 @@
     -fx-border-width: 0 0 1 0;
 }
 .panel-box {
-    -fx-background-color: #313335;
+    -fx-background-color: #252526;
     -fx-background-radius: 5;
     -fx-padding: 10;
-    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.2), 3, 0, 0, 1);
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.4), 4, 0, 0, 1);
 }
 .section-label {
-    -fx-text-fill: #aaaaaa;
-    -fx-font-size: 10px;
+    -fx-text-fill: #007acc;
+    -fx-font-size: 11px;
     -fx-font-weight: bold;
+    -fx-font-family: "Segoe UI", "Arial";
+    -fx-padding: 0 0 5 0;
 }
 
-/*BOTONES*/
 .button {
     -fx-background-color: #3a506b;
     -fx-text-fill: white;
     -fx-font-weight: bold;
-    -fx-font-size: 12px;
+    -fx-font-size: 11px;
     -fx-background-radius: 4;
     -fx-cursor: hand;
     -fx-padding: 6 12 6 12;
@@ -34,19 +34,17 @@
 }
 .button:hover {
     -fx-background-color: #007acc;
-    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.4), 5, 0, 0, 1);
+    -fx-effect: dropshadow(three-pass-box, rgba(0,122,204,0.4), 8, 0, 0, 0);
 }
 .button:pressed {
     -fx-background-color: #005a9e;
     -fx-background-insets: 1;
 }
 
-/* Botones de Iconos*/
 .icon-button {
-    -fx-background-color: #3c3f41;
-    -fx-border-color: #555555;
-    -fx-border-radius: 5;
-    -fx-background-radius: 5;
+    -fx-background-color: #3a3a3c;
+    -fx-border-color: transparent;
+    -fx-background-radius: 4;
     -fx-padding: 4;
     -fx-cursor: hand;
     -fx-content-display: GRAPHIC_ONLY;
@@ -54,33 +52,30 @@
     -fx-min-height: 28px;
 }
 .icon-button:hover {
-    -fx-background-color: #4b6eaf;
-    -fx-border-color: #4b6eaf;
-    -fx-effect: none;
+    -fx-background-color: #007acc;
 }
 .icon-button:pressed {
-    -fx-background-color: #2b4b8f;
+    -fx-background-color: #005a9e;
 }
 
-/* SVG dentro de botones */
 .icon-svg {
-    -fx-fill: #dddddd;
+    -fx-fill: #cccccc;
 }
 .icon-button:hover .icon-svg {
     -fx-fill: white;
 }
 
-/* Toggle Buttons */
 .toggle-button {
-    -fx-background-color: #2b2b2b;
+    -fx-background-color: #3a3a3c;
     -fx-text-fill: #bbbbbb;
-    -fx-border-color: #4b6eaf;
+    -fx-border-color: #555555;
     -fx-border-radius: 4;
     -fx-background-radius: 4;
     -fx-cursor: hand;
+    -fx-font-size: 11px;
 }
 .toggle-button:hover {
-    -fx-background-color: #3c3f41;
+    -fx-background-color: #454545;
     -fx-text-fill: white;
 }
 .toggle-button:selected {
@@ -89,19 +84,18 @@
     -fx-border-color: #007acc;
 }
 
-/*CONTROLES DE ENTRADA*/
 .text-field {
     -fx-background-color: #1e1e1e;
     -fx-text-fill: white;
     -fx-prompt-text-fill: #666666;
-    -fx-background-radius: 3;
-    -fx-border-color: #555555;
-    -fx-border-radius: 3;
+    -fx-background-radius: 2;
+    -fx-border-color: #3e3e42;
+    -fx-border-radius: 2;
     -fx-padding: 4 7 4 7;
 }
 .text-field:focused {
     -fx-border-color: #007acc;
-    -fx-background-color: #252526;
+    -fx-background-color: #000000;
 }
 
 .color-picker {
@@ -116,13 +110,15 @@
 .color-picker .label {
     -fx-text-fill: white;
 }
+
 .spinner {
     -fx-background-color: transparent;
     -fx-border-color: transparent;
 }
 .spinner .increment-arrow-button,
 .spinner .decrement-arrow-button {
-    -fx-background-color: #3c3f41;
+    -fx-background-color: #3a3a3c;
+    -fx-background-radius: 0;
 }
 .spinner .increment-arrow-button:hover,
 .spinner .decrement-arrow-button:hover {
@@ -138,14 +134,13 @@
 }
 
 .radio-button {
-    -fx-text-fill: #e0e0e0;
+    -fx-text-fill: #cccccc;
     -fx-cursor: hand;
+    -fx-font-size: 11px;
 }
 .radio-button .radio {
-    -fx-background-color: #2b2b2b;
-    -fx-border-color: #888888;
-    -fx-border-radius: 10px;
-    -fx-background-radius: 10px;
+    -fx-background-color: #1e1e1e;
+    -fx-border-color: #666666;
 }
 .radio-button:selected .radio .dot {
     -fx-background-color: #007acc;
@@ -155,42 +150,37 @@
     -fx-border-color: #007acc;
 }
 
-/*SLIDERS*/
 .slider .track {
     -fx-background-color: #1e1e1e;
-    -fx-border-color: #555555;
-    -fx-border-radius: 5px;
-    -fx-background-radius: 5px;
+    -fx-border-color: #3e3e42;
+    -fx-border-radius: 2px;
 }
 .slider .thumb {
-    -fx-background-color: #aaaaaa;
-    -fx-background-radius: 10px;
+    -fx-background-color: #3a506b;
+    -fx-background-radius: 50%;
     -fx-cursor: hand;
 }
 .slider .thumb:hover {
-    -fx-background-color: white;
-    -fx-effect: dropshadow(three-pass-box, rgba(0,122,204,0.6), 5, 0, 0, 0);
+    -fx-background-color: #007acc;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,122,204,0.6), 6, 0, 0, 0);
 }
 
-/*SCROLL BARS*/
 .scroll-bar {
     -fx-background-color: #2b2b2b;
 }
 .scroll-bar .thumb {
-    -fx-background-color: #555555;
-    -fx-background-radius: 5px;
+    -fx-background-color: #444444;
+    -fx-background-radius: 2px;
 }
 .scroll-bar .thumb:hover {
-    -fx-background-color: #777777;
+    -fx-background-color: #007acc;
 }
 .scroll-bar .track {
-    -fx-background-color: #1e1e1e;
-    -fx-border-color: transparent;
+    -fx-background-color: transparent;
 }
 .scroll-bar .increment-button,
 .scroll-bar .decrement-button {
     -fx-background-color: transparent;
-    -fx-border-color: transparent;
 }
 .scroll-pane {
     -fx-background-color: transparent;
@@ -199,81 +189,80 @@
     -fx-background-color: transparent;
 }
 
-/*TABS Y TITLED PANES*/
 .tab-header-background {
-    -fx-background-color: #1b2631;
+    -fx-background-color: #313335;
 }
 .tab {
-    -fx-background-color: #2c3e50;
-    -fx-background-radius: 5 5 0 0;
-    -fx-background-insets: 0 2 0 0;
+    -fx-background-color: transparent;
+    -fx-background-radius: 0;
+    -fx-border-width: 0 0 3 0;
     -fx-border-color: transparent;
     -fx-cursor: hand;
+    -fx-padding: 8 10 8 10;
 }
 .tab .tab-label {
-    -fx-text-fill: #bdc3c7;
+    -fx-text-fill: #888888;
     -fx-font-weight: normal;
+    -fx-font-size: 11px;
 }
-.tab:hover {
-    -fx-background-color: #34495e;
+.tab:hover .tab-label {
+    -fx-text-fill: #cccccc;
 }
 .tab:selected {
-    -fx-background-color: #005a9e;
-    -fx-background-radius: 5 5 0 0;
+    -fx-border-color: #007acc;
 }
 .tab:selected .tab-label {
-    -fx-text-fill: white;
+    -fx-text-fill: #007acc;
     -fx-font-weight: bold;
 }
 .tab-content-area {
-    -fx-background-color: #3c3f41;
-    -fx-border-color: #005a9e;
-    -fx-border-width: 3 0 0 0;
-}
-.titled-pane {
-    -fx-text-fill: white;
-}
-.titled-pane > .title {
-    -fx-background-color: #2b2b2b;
-    -fx-background-radius: 5;
-    -fx-border-color: #1e1e1e;
-    -fx-border-width: 0 0 1 0;
-}
-.titled-pane > .title:hover {
-    -fx-background-color: #35383a;
-}
-.titled-pane > .content {
-    -fx-background-color: #3c3f41;
-    -fx-border-color: #1e1e1e;
-    -fx-border-width: 0 0 1 0;
-}
-.titled-pane > .title > .arrow-button .arrow {
-    -fx-background-color: white;
+    -fx-background-color: #313335;
+    -fx-border-width: 0;
 }
 
-/*GRAFICOS*/
+.titled-pane {
+    -fx-text-fill: #e0e0e0;
+}
+.titled-pane > .title {
+    -fx-background-color: #313335;
+    -fx-border-color: #007acc;
+    -fx-border-width: 0 0 0 2;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+}
+.titled-pane > .title:hover {
+    -fx-background-color: #3a3a3c;
+}
+.titled-pane > .content {
+    -fx-background-color: #313335;
+    -fx-border-color: transparent;
+}
+.titled-pane > .title > .arrow-button .arrow {
+    -fx-background-color: #007acc;
+}
+
 .chart-series-area-line {
-    -fx-stroke-width: 1px;
+    -fx-stroke-width: 1.5px;
     -fx-stroke: #007acc;
 }
 .chart-series-area-fill {
-    -fx-opacity: 0.2;
-    -fx-fill: #007acc;
+    -fx-opacity: 0.3;
+    -fx-fill: linear-gradient(to bottom, rgba(0,122,204,0.5), rgba(0,122,204,0.0));
 }
 .chart-series-line {
     -fx-stroke: #007acc;
+    -fx-stroke-width: 1.5px;
 }
 .chart-plot-background {
     -fx-background-color: transparent;
 }
 .axis {
-    -fx-tick-label-fill: #bbbbbb;
+    -fx-tick-label-fill: #888888;
 }
 .axis-label {
-    -fx-text-fill: #bbbbbb;
+    -fx-text-fill: #888888;
 }
 
-/*SECCION PROPIEDADES*/
 .info-row {
     -fx-alignment: CENTER_LEFT;
     -fx-padding: 2 0 2 0;
@@ -285,12 +274,12 @@
     -fx-padding: 0 0 0 8;
 }
 .info-value {
-    -fx-text-fill: white;
+    -fx-text-fill: #dddddd;
     -fx-font-family: "Segoe UI", "Arial";
     -fx-font-size: 11px;
     -fx-padding: 0 0 0 8;
 }
 .info-icon {
     -fx-fill: #007acc;
-    -fx-effect: dropshadow(three-pass-box, rgba(0,122,204,0.4), 5, 0, 0, 0);
+    -fx-effect: dropshadow(three-pass-box, rgba(0,122,204,0.6), 8, 0, 0, 0);
 }
