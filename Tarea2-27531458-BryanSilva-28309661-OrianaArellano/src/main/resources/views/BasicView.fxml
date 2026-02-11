@@ -644,7 +644,7 @@
                                                             <Separator opacity="0.3" />
 
                                                             <Label text="Radio de Corte:" textFill="#aaaaaa" />
-                                                            <Slider fx:id="dftRadiusSlider" blockIncrement="5.0" majorTickUnit="20.0" max="120.0" min="5.0" showTickLabels="true" showTickMarks="true" value="50.0" />
+                                                            <Slider fx:id="dftRadiusSlider" blockIncrement="1.0" majorTickUnit="10.0" max="60.0" min="1.0" showTickLabels="true" showTickMarks="true" value="5.0" />
 
                                                             <HBox spacing="5.0">
                                                                 <Button maxWidth="Infinity" onAction="#onApplyLowPassDFT" text="Paso Bajo" HBox.hgrow="ALWAYS" />
@@ -661,7 +661,7 @@
                                                             <Separator opacity="0.3" />
 
                                                             <Label text="Radio de Corte:" textFill="#aaaaaa" />
-                                                            <Slider fx:id="dctThresholdSlider" blockIncrement="5.0" majorTickUnit="20.0" max="120.0" min="5.0" showTickLabels="true" showTickMarks="true" value="50.0" />
+                                                            <Slider fx:id="dctThresholdSlider" blockIncrement="1.0" majorTickUnit="10.0" max="60.0" min="1.0" showTickLabels="true" showTickMarks="true" value="5.0" />
 
                                                             <HBox spacing="5.0">
                                                                 <Button maxWidth="Infinity" onAction="#onApplyLowPassDCT" text="Paso Bajo" HBox.hgrow="ALWAYS" />

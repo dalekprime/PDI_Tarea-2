@@ -13,7 +13,7 @@ class FrequencyController {
     fun applyDFT(input: ImageMatrix): ImageMatrix {
         val src = input.image
 
-        //Convertir a gris y flotante
+        //Convertir a gris
         val gray = Mat()
         if (src.channels() > 1) {
             Imgproc.cvtColor(src, gray, Imgproc.COLOR_BGR2GRAY)
@@ -44,56 +44,23 @@ class FrequencyController {
         //Centrar cuadrantes
         shiftQuadrants(mag)
 
-        //Normalizar como Matplotlib
+        //Normalizar
         Core.normalize(mag, mag, 0.0, 255.0, Core.NORM_MINMAX)
 
         //Convertir a 8 bits
         val result = Mat()
         mag.convertTo(result, CvType.CV_8U)
 
-        //Invertir intensidades
+        //Fondo blanco y detalles oscuros
         Core.bitwise_not(result, result)
 
         return ImageMatrix(result)
     }
-        // Ver Espectro DCT
-        fun applyDCT1(input: ImageMatrix): ImageMatrix {
-            val gray = ensureGrayAndFloat(input.image)
-            val padded = getPaddedImage(gray) // DCT prefiere tamaños pares
-
-            val dctMat = Mat()
-            Core.dct(padded, dctMat)
-
-            // Visualización Logarítmica
-            Core.absdiff(dctMat, Scalar.all(0.0), dctMat)
-            Core.add(dctMat, Scalar.all(1.0), dctMat)
-            Core.log(dctMat, dctMat)
-            Core.normalize(dctMat, dctMat, 0.0, 255.0, Core.NORM_MINMAX)
-
-            val result = Mat()
-            dctMat.convertTo(result, CvType.CV_8U)
-            Core.bitwise_not(result, result) // Invertir colores
-
-            // Recortar al tamaño original
-            return ImageMatrix(result.submat(Rect(0, 0, input.image.width(), input.image.height())))
-        }
-
-        // Calcula el tamaño óptimo y añade bordes (padding)
-        private fun getPaddedImage(img: Mat): Mat {
-            val m = Core.getOptimalDFTSize(img.rows())
-            val n = Core.getOptimalDFTSize(img.cols())
-            val padded = Mat()
-            Core.copyMakeBorder(
-                img, padded, 0, m - img.rows(), 0, n - img.cols(),
-                Core.BORDER_CONSTANT, Scalar.all(0.0)
-            )
-            return padded
-        }
 
     fun applyDCT(input: ImageMatrix): ImageMatrix {
         val src = input.image
 
-        // 1. Convertir a Gris y Flotante (Necesario para DCT)
+        //Convertir a Gris
         val gray = Mat()
         if (src.channels() > 1) {
             Imgproc.cvtColor(src, gray, Imgproc.COLOR_BGR2GRAY)
@@ -103,51 +70,45 @@ class FrequencyController {
         val floatImg = Mat()
         gray.convertTo(floatImg, CvType.CV_32F)
 
-        // 2. ASEGURAR TAMAÑO PAR (Sin Padding)
-        // En lugar de agregar bordes negros, recortamos 1 pixel si sobra.
-        // La operación 'and -2' convierte cualquier número impar en el par anterior (501 -> 500).
+        //Tamaño par sin padding
         val newWidth = floatImg.cols() and -2
         val newHeight = floatImg.rows() and -2
-
-        // Creamos una submatriz (referencia) con tamaño par
         val evenImg = floatImg.submat(Rect(0, 0, newWidth, newHeight))
 
-        // 3. Aplicar DCT Directamente
+        //DCT
         val dctMat = Mat()
         Core.dct(evenImg, dctMat)
 
-        // 4. Visualización Logarítmica (Para ver algo, porque la DCT cruda es muy oscura)
-        // |dct|
+        //Logaritmo
         Core.absdiff(dctMat, Scalar.all(0.0), dctMat)
-        // log(1 + |dct|)
         Core.add(dctMat, Scalar.all(1.0), dctMat)
         Core.log(dctMat, dctMat)
-        // Normalizar a 0-255
+        //Normalizar
         Core.normalize(dctMat, dctMat, 0.0, 255.0, Core.NORM_MINMAX)
 
-        // 5. Convertir a imagen visible
+        //Convertir a 8 bits
         val result = Mat()
         dctMat.convertTo(result, CvType.CV_8U)
 
-        // Invertir (Fondo blanco, detalles oscuros) - Opcional, pero se ve mejor
+        //Fondo blanco y detalles oscuros
         Core.bitwise_not(result, result)
 
         return ImageMatrix(result)
     }
 
-    fun applyDFTFilterCommon(input: ImageMatrix, radius: Double, isLowPass: Boolean): ImageMatrix {
+    fun applyDFTFilter(input: ImageMatrix, radius: Double, isLowPass: Boolean): ImageMatrix {
         val src = input.image
 
-        // 1. Separar Canales
+        //Separar Canales
         val channels = ArrayList<Mat>()
         Core.split(src, channels)
         val resultChannels = ArrayList<Mat>()
 
-        // 2. Padding
+        //Padding
         val rows = Core.getOptimalDFTSize(src.rows())
         val cols = Core.getOptimalDFTSize(src.cols())
 
-        // 3. Máscara Gaussiana
+        //Máscara Gaussiana
         val mask = Mat(rows, cols, CvType.CV_32F)
         val cx = cols / 2.0
         val cy = rows / 2.0
@@ -170,7 +131,7 @@ class FrequencyController {
         val maskMulti = Mat()
         Core.merge(maskComplexArr, maskMulti)
 
-        // 4. Procesar Canales
+        //Procesar Canales
         for (channel in channels) {
             val floatImg = Mat()
             channel.convertTo(floatImg, CvType.CV_32F)
@@ -185,20 +146,20 @@ class FrequencyController {
             Core.merge(complex, complexI)
 
             Core.dft(complexI, complexI)
-            Core.mulSpectrums(complexI, maskMulti, complexI, 0)
 
-            // D. IDFT (Usando SCALE para recuperar la intensidad real)
+            if (isLowPass) {
+                Core.multiply(complexI, maskMulti, complexI)
+            } else {
+                Core.mulSpectrums(complexI, maskMulti, complexI, 0)
+            }
+
+            //IDFT
             Core.idft(complexI, complexI, Core.DFT_SCALE or Core.DFT_REAL_OUTPUT)
 
-            // E. --- CORRECCIÓN DEL COLOR AZUL ---
             if (!isLowPass) {
-                // Paso Alto: SÍ normalizamos (estiramos contraste) para ver los bordes.
                 Core.normalize(complexI, complexI, 0.0, 255.0, Core.NORM_MINMAX)
             }
-            // Paso Bajo: NO hacemos nada. Dejamos los valores originales.
-            // Al convertir a CV_8U abajo, OpenCV recorta automáticamente lo que sobra.
 
-            // F. Recortar y guardar
             val result = Mat()
             complexI.convertTo(result, CvType.CV_8U) // Aquí se ajustan los colores automáticamente
             val finalChannel = result.submat(Rect(0, 0, src.cols(), src.rows()))
@@ -214,17 +175,18 @@ class FrequencyController {
     fun applyDCTFilter(input: ImageMatrix, radius: Double, isLowPass: Boolean): ImageMatrix {
         val src = input.image
 
-        //Separar la imagen en 3 canales
+        //Separar Canales
         val channels = ArrayList<Mat>()
         Core.split(src, channels)
         val resultChannels = ArrayList<Mat>()
 
-        //Calcular padding ya que DCT necesita tamaño par
+        //Padding
         val rows = src.rows()
         val cols = src.cols()
         val paddedRows = if (rows % 2 != 0) rows + 1 else rows
         val paddedCols = if (cols % 2 != 0) cols + 1 else cols
 
+        //Máscara Gaussiana
         val mask = Mat(paddedRows, paddedCols, CvType.CV_32F)
         val twoSigmaSq = 2 * radius * radius
 
@@ -232,6 +194,7 @@ class FrequencyController {
             for (x in 0 until paddedCols) {
                 val distSq = (x * x).toDouble() + (y * y).toDouble()
                 var value = kotlin.math.exp(-distSq / twoSigmaSq)
+
                 if (!isLowPass) {
                     value = 1.0 - value
                 }
@@ -239,6 +202,7 @@ class FrequencyController {
             }
         }
 
+        //Procesar Canales
         for (channel in channels) {
             val floatImg = Mat()
             channel.convertTo(floatImg, CvType.CV_32F)
@@ -255,42 +219,31 @@ class FrequencyController {
             //IDCT
             Core.idct(dctMat, dctMat)
 
-            // Normalizar
-            Core.normalize(dctMat, dctMat, 0.0, 255.0, Core.NORM_MINMAX)
+            if (!isLowPass) {
+                Core.normalize(dctMat, dctMat, 0.0, 255.0, Core.NORM_MINMAX)
+            }
 
             val result = Mat()
-            dctMat.convertTo(result, CvType.CV_8U)
+            dctMat.convertTo(result, CvType.CV_8U) // OpenCV recorta automáticamente a 0-255
 
             val finalChannel = result.submat(Rect(0, 0, cols, rows))
             resultChannels.add(finalChannel)
         }
 
-        //Unir los canales procesados
+        //Unir Canales
         val finalImage = Mat()
         Core.merge(resultChannels, finalImage)
 
         return ImageMatrix(finalImage)
     }
 
-    private fun ensureGrayAndFloat(src: Mat): Mat {
-        val gray = Mat()
-        if (src.channels() > 1) {
-            Imgproc.cvtColor(src, gray, Imgproc.COLOR_BGR2GRAY)
-        } else {
-            src.copyTo(gray)
-        }
-        val floatImg = Mat()
-        gray.convertTo(floatImg, CvType.CV_32F)
-        return floatImg
-    }
-
     private fun shiftQuadrants(image: Mat) {
         val cx = image.cols() / 2
         val cy = image.rows() / 2
-        val q0 = image.submat(Rect(0, 0, cx, cy))      // Top-Left
-        val q1 = image.submat(Rect(cx, 0, cx, cy))     // Top-Right
-        val q2 = image.submat(Rect(0, cy, cx, cy))     // Bottom-Left
-        val q3 = image.submat(Rect(cx, cy, cx, cy))    // Bottom-Right
+        val q0 = image.submat(Rect(0, 0, cx, cy))
+        val q1 = image.submat(Rect(cx, 0, cx, cy))
+        val q2 = image.submat(Rect(0, cy, cx, cy))
+        val q3 = image.submat(Rect(cx, cy, cx, cy))
 
         val tmp = Mat()
         q0.copyTo(tmp)

@@ -1128,6 +1128,12 @@ class BasicViewController {
         imageController.changeView(matrixImage!!)
     }
 
+    //DFT y DCT
+    @FXML lateinit var dftRadiusSlider: Slider
+    @FXML lateinit var dctThresholdSlider: Slider
+    @FXML lateinit var wienerNoiseSlider: Slider
+    @FXML lateinit var wienerKernelSpinner: Spinner<Int>
+
     fun onapplyDFTClick(event: ActionEvent) {
         matrixImage ?: return
         imageController.saveToHistory(matrixImage!!)
@@ -1135,37 +1141,6 @@ class BasicViewController {
         imageController.changeView(matrixImage!!)
     }
 
-    @FXML lateinit var dftRadiusSlider: Slider
-    @FXML lateinit var dctThresholdSlider: Slider
-    @FXML lateinit var wienerNoiseSlider: Slider
-    @FXML lateinit var wienerKernelSpinner: Spinner<Int>
-
-    // -----------------------------------------------------------
-    // FUNCIONES DE FOURIER (DFT) - Tarea y 09
-    // -----------------------------------------------------------
-
-    /*
-    @FXML
-    fun onApplyLowPassDFT(event: ActionEvent) {
-        matrixImage ?: return
-        imageController.saveToHistory(matrixImage!!)
-        // Tarea 09: Filtro Paso Bajo (DFT)
-        val radius = dftRadiusSlider.value
-        matrixImage = frequencyController.applyLowStep(matrixImage!!, radius)
-        imageController.changeView(matrixImage!!)
-    }
-
-    @FXML
-    fun onApplyHighPassDFT(event: ActionEvent) {
-        matrixImage ?: return
-        imageController.saveToHistory(matrixImage!!)
-        // Tarea 09: Filtro Paso Alto (DFT)
-        val radius = dftRadiusSlider.value
-        matrixImage = frequencyController.applyHighStep(matrixImage!!, radius)
-        imageController.changeView(matrixImage!!)
-    }
-
-    */
     @FXML
     fun onShowDCTSpectrum(event: ActionEvent) {
         matrixImage ?: return
@@ -1176,22 +1151,20 @@ class BasicViewController {
     }
 
     @FXML
-    fun onApplyLowPassDFT(event: ActionEvent) { // O onApplyLowPassClick
+    fun onApplyLowPassDFT(event: ActionEvent) {
         matrixImage ?: return
         imageController.saveToHistory(matrixImage!!)
         val radius = dftRadiusSlider.value
-        // Llama a la nueva función
-        matrixImage = frequencyController.applyDFTFilterCommon(matrixImage!!, radius, true)
+        matrixImage = frequencyController.applyDFTFilter(matrixImage!!, radius, true)
         imageController.changeView(matrixImage!!)
     }
 
     @FXML
-    fun onApplyHighPassDFT(event: ActionEvent) { // O onApplyHighPassClick
+    fun onApplyHighPassDFT(event: ActionEvent) {
         matrixImage ?: return
         imageController.saveToHistory(matrixImage!!)
         val radius = dftRadiusSlider.value
-        // Llama a la nueva función
-        matrixImage = frequencyController.applyDFTFilterCommon(matrixImage!!, radius, false)
+        matrixImage = frequencyController.applyDFTFilter(matrixImage!!, radius, false)
         imageController.changeView(matrixImage!!)
     }
 
@@ -1200,12 +1173,8 @@ class BasicViewController {
     fun onApplyLowPassDCT(event: ActionEvent) {
         matrixImage ?: return
         imageController.saveToHistory(matrixImage!!)
-
         val threshold = dctThresholdSlider.value
-
-        // CORREGIDO: Llamar a applyDCTFilter
         matrixImage = frequencyController.applyDCTFilter(matrixImage!!, threshold, true)
-
         imageController.changeView(matrixImage!!)
     }
 
@@ -1213,28 +1182,17 @@ class BasicViewController {
     fun onApplyHighPassDCT(event: ActionEvent) {
         matrixImage ?: return
         imageController.saveToHistory(matrixImage!!)
-
         val threshold = dctThresholdSlider.value
-
-        // CORREGIDO: Llamar a applyDCTFilter
         matrixImage = frequencyController.applyDCTFilter(matrixImage!!, threshold, false)
-
         imageController.changeView(matrixImage!!)
     }
     @FXML
     fun onApplyWiener(event: ActionEvent) {
         matrixImage ?: return
         imageController.saveToHistory(matrixImage!!)
-
         val noise = wienerNoiseSlider.value
-        // Forzamos a entero por si acaso
         val kernel = wienerKernelSpinner.value.toString().toInt()
-
-        // --- CORRECCIÓN AQUÍ ---
-        // Antes: frequencyController.applyWiener(...)  <-- ERROR
-        // Ahora: nonLinearController.applyWiener(...)  <-- CORRECTO
         matrixImage = noLinearController.applyWiener(matrixImage!!, kernel, noise)
-
         imageController.changeView(matrixImage!!)
     }
 }
