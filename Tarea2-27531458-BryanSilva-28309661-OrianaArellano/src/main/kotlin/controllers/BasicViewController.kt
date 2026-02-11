@@ -39,6 +39,7 @@ import org.opencv.core.Core
 import org.opencv.core.CvType
 import org.opencv.core.Mat
 import org.opencv.core.Scalar
+import javax.swing.text.StyledEditorKit
 
 class BasicViewController {
 
@@ -171,6 +172,8 @@ class BasicViewController {
         //Restable el Zoom
         currentZoomLevel = 0
         currentZoomMethod = "NONE"
+        //Espectro
+        spectrumShow = "NONE"
     }
 
     //Descargar imagenes
@@ -208,6 +211,10 @@ class BasicViewController {
     @FXML
     fun onOriginalButtton(event: ActionEvent) {
         originalImage ?: return
+        currentZoomLevel = 0
+        currentZoomMethod = "NONE"
+        spectrumShow = "NONE"
+        imageController.updateZoom(currentZoomLevel, currentZoomMethod)
         matrixImage = originalImage!!.copy()
         originalGeometryImage = originalImage!!.copy()
         imageController.changeView(matrixImage!!)
@@ -740,7 +747,8 @@ class BasicViewController {
         imageController.saveToHistory(matrixImage!!)
         val orientation = if (radioXRoberts.isSelected) "X" else "Y"
         val kernel = Kernel(2, 2).generateRoberts(orientation)
-        val result = ConvolutionController().apply(matrixImage!!, kernel)
+        var result = ConvolutionController().apply(matrixImage!!, kernel)
+        result = tonoController.greyScale(result)
         matrixImage = result
         imageController.changeView(matrixImage!!)
     }
@@ -768,7 +776,8 @@ class BasicViewController {
         val cols = colsSpinnerSobel.value
         val orientation = if (radioXSobel.isSelected) "X" else "Y"
         val kernel = Kernel(rows, cols).generateSobel(rows, cols, orientation)
-        val result = ConvolutionController().apply(matrixImage!!, kernel)
+        var result = ConvolutionController().apply(matrixImage!!, kernel)
+        result = tonoController.greyScale(result)
         matrixImage = result
         imageController.changeView(matrixImage!!)
     }
@@ -796,9 +805,11 @@ class BasicViewController {
         val cols = colsSpinnerPrewitt.value
         val orientation = if (radioXPrewitt.isSelected) "X" else "Y"
         val kernel = Kernel(rows, cols).generatePrewitt(rows, cols, orientation)
-        val result = ConvolutionController().apply(matrixImage!!, kernel)
+        var result = ConvolutionController().apply(matrixImage!!, kernel)
+        result = tonoController.greyScale(result)
         matrixImage = result
         imageController.changeView(matrixImage!!)
+
     }
 
     @FXML
@@ -906,7 +917,9 @@ class BasicViewController {
         gxFloat.release()
         gyFloat.release()
         magnitude.release()
-        return ImageMatrix(result, matrixImage!!)
+        var grey = ImageMatrix(result, matrixImage!!)
+        grey = tonoController.greyScale(grey)
+        return grey
     }
 
     fun calculateAngles(gx: ImageMatrix, gy: ImageMatrix): ImageMatrix {
@@ -1116,20 +1129,31 @@ class BasicViewController {
     @FXML lateinit var dctThresholdSlider: Slider
     @FXML lateinit var wienerNoiseSlider: Slider
     @FXML lateinit var wienerKernelSpinner: Spinner<Int>
-
+    var spectrumShow: String = "NONE"
     fun onapplyDFTClick(event: ActionEvent) {
         matrixImage ?: return
-        imageController.saveToHistory(matrixImage!!)
-        matrixImage = frequencyController.applyDFT(matrixImage!!)
+        if(spectrumShow == "NONE" || spectrumShow == "DCT"){
+            spectrumShow = "DFT"
+            imageController.saveToHistory(matrixImage!!)
+            matrixImage = frequencyController.applyDFT(matrixImage!!)
+        }else{
+            matrixImage = imageController.undo(matrixImage!!)
+            spectrumShow = "NONE"
+        }
         imageController.changeView(matrixImage!!)
     }
 
     @FXML
     fun onShowDCTSpectrum(event: ActionEvent) {
         matrixImage ?: return
-        imageController.saveToHistory(matrixImage!!)
-        // Tarea 13: Ver espectro DCT
-        matrixImage = frequencyController.applyDCT(matrixImage!!)
+        if(spectrumShow == "NONE" || spectrumShow == "DFT"){
+            spectrumShow = "DCT"
+            imageController.saveToHistory(matrixImage!!)
+            matrixImage = frequencyController.applyDCT(matrixImage!!)
+        }else{
+            matrixImage = imageController.undo(matrixImage!!)
+            spectrumShow = "NONE"
+        }
         imageController.changeView(matrixImage!!)
     }
 

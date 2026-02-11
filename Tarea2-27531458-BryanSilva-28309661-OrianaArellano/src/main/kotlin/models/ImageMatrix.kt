@@ -8,9 +8,7 @@ import org.opencv.imgproc.Imgproc
 import java.io.File
 import org.opencv.core.Mat
 import org.opencv.imgcodecs.Imgcodecs;
-import java.io.BufferedReader
-import java.io.FileReader
-import java.io.StreamTokenizer
+import java.util.Scanner
 
 class ImageMatrix {
     var image: Mat
@@ -58,60 +56,60 @@ class ImageMatrix {
         currentPanningLevelY1 = image.height().toDouble()
         currentPanningMethod = "NOEX"
     }
+
     private fun loadFromRLE(file: File): Mat {
-        val reader = BufferedReader(FileReader(file))
-        val tokenizer = StreamTokenizer(reader)
-        tokenizer.commentChar('#'.code)
-        fun nextToken(): Int {
-            val token = tokenizer.nextToken()
-            if (token == StreamTokenizer.TT_EOF) throw Exception("Archivo incompleto (EOF inesperado)")
-            return token
-        }
-        fun nextString(): String {
-            nextToken()
-            return tokenizer.sval ?: ""
+        val scanner = Scanner(file.inputStream().buffered())
+        fun nextToken(): String {
+            while (scanner.hasNext()) {
+                if (scanner.hasNext("#.*")) {
+                    scanner.nextLine()
+                    continue
+                }
+                return scanner.next()
+            }
+            throw Exception("Archivo incompleto (EOF inesperado)")
         }
         fun nextInt(): Int {
-            nextToken()
-            return tokenizer.nval.toInt()
+            val token = nextToken()
+            return token.toIntOrNull() ?: throw Exception("Se esperaba un número, se encontró: $token")
         }
-        val header = nextString()
-        if (header !in listOf("P1", "P2", "P3")) {
-            reader.close()
-            throw Exception("Formato RLE no soportado: $header")
-        }
-        val width = nextInt()
-        val height = nextInt()
-        val maxVal = if (header != "P1") nextInt() else 1
-        val totalPixels = width * height
-        var filledPixels = 0
-        val channels = if (header == "P3") 3 else 1
-        val type = if (header == "P3") CvType.CV_8UC3 else CvType.CV_8UC1
-        val buffer = ByteArray(totalPixels * channels)
-        var bufferIdx = 0
         try {
+            val header = nextToken()
+            if (header !in listOf("P1", "P2", "P3")) {
+                scanner.close()
+                throw Exception("Formato RLE no soportado: $header")
+            }
+            val width = nextInt()
+            val height = nextInt()
+            val maxVal = if (header != "P1") nextInt() else 1
+            val totalPixels = width * height
+            var filledPixels = 0
+            val channels = if (header == "P3") 3 else 1
+            val type = if (header == "P3") CvType.CV_8UC3 else CvType.CV_8UC1
+            val buffer = ByteArray(totalPixels * channels)
+            var bufferIdx = 0
             while (filledPixels < totalPixels) {
                 when (header) {
                     "P1" -> {
                         val value = nextInt()
                         val count = nextInt()
                         val pixelByte = (if (value == 0) 0 else 255).toByte()
-                        repeat(count) {
-                            if (bufferIdx < buffer.size) {
-                                buffer[bufferIdx++] = pixelByte
-                                filledPixels++
-                            }
+                        var c = 0
+                        while (c < count && filledPixels < totalPixels) {
+                            buffer[bufferIdx++] = pixelByte
+                            filledPixels++
+                            c++
                         }
                     }
                     "P2" -> {
                         val gray = nextInt()
                         val count = nextInt()
                         val pixelVal = ((gray * 255) / maxVal).toByte()
-                        repeat(count) {
-                            if (bufferIdx < buffer.size) {
-                                buffer[bufferIdx++] = pixelVal
-                                filledPixels++
-                            }
+                        var c = 0
+                        while (c < count && filledPixels < totalPixels) {
+                            buffer[bufferIdx++] = pixelVal
+                            filledPixels++
+                            c++
                         }
                     }
                     "P3" -> {
@@ -119,25 +117,29 @@ class ImageMatrix {
                         val g = nextInt()
                         val b = nextInt()
                         val count = nextInt()
-                        repeat(count) {
-                            if (bufferIdx < buffer.size - 2) {
-                                buffer[bufferIdx++] = b.toByte()
-                                buffer[bufferIdx++] = g.toByte()
-                                buffer[bufferIdx++] = r.toByte()
-                                filledPixels++
-                            }
+                        val rb = r.toByte()
+                        val gb = g.toByte()
+                        val bb = b.toByte()
+                        var c = 0
+                        while (c < count && filledPixels < totalPixels) {
+                            buffer[bufferIdx++] = bb
+                            buffer[bufferIdx++] = gb
+                            buffer[bufferIdx++] = rb
+                            filledPixels++
+                            c++
                         }
                     }
                 }
             }
+            scanner.close()
+            val mat = Mat(height, width, type)
+            mat.put(0, 0, buffer)
+            return mat
         } catch (e: Exception) {
-            reader.close()
+            scanner.close()
+            e.printStackTrace()
             throw Exception("Error parseando datos RLE: ${e.message}")
         }
-        reader.close()
-        val mat = Mat(height, width, type)
-        mat.put(0, 0, buffer)
-        return mat
     }
     fun matrixToImage(): Image{
         val width = image.width()
