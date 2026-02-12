@@ -644,7 +644,7 @@
                                                         <Label style="-fx-font-weight: bold;" text="Fourier (DFT)" textFill="WHITE" />
                                                         <VBox spacing="10.0" styleClass="panel-box">
                                                             <Button maxWidth="Infinity" onAction="#onapplyDFTClick" text="Ver Espectro Centrado" />
-
+                                                            <Button maxWidth="Infinity" onAction="#onapplyDFTClickPhase" text="Ver Fase" />
                                                             <Separator opacity="0.3" />
 
                                                             <Label text="Radio de Corte:" textFill="#aaaaaa" />

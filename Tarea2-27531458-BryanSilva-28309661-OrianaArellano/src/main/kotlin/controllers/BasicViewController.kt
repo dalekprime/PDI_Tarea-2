@@ -39,7 +39,9 @@ import org.opencv.core.Core
 import org.opencv.core.CvType
 import org.opencv.core.Mat
 import org.opencv.core.Scalar
+import org.opencv.imgproc.Imgproc
 import javax.swing.text.StyledEditorKit
+import kotlin.math.hypot
 
 class BasicViewController {
 
@@ -936,9 +938,45 @@ class BasicViewController {
         gxFloat.release()
         gyFloat.release()
         angles.release()
-        return ImageMatrix(result, matrixImage!!)
+        var resultImage = ImageMatrix(result, matrixImage!!)
+        resultImage = combineGradient(gx, gy)
+        resultImage = drawGradientArrows(gx.image, gy.image, resultImage.image)
+        return resultImage
     }
-
+    private fun drawGradientArrows(gx: Mat, gy: Mat, originalImage: Mat): ImageMatrix {
+        val dst = Mat()
+        if (originalImage.channels() == 1) {
+            Imgproc.cvtColor(originalImage, dst, Imgproc.COLOR_GRAY2BGR)
+        } else {
+            originalImage.copyTo(dst)
+        }
+        val step = 20
+        val color = Scalar(0.0, 255.0, 0.0)
+        for (y in 0 until dst.rows() step step) {
+            for (x in 0 until dst.cols() step step) {
+                val valX = gx.get(y, x)[0]
+                val valY = gy.get(y, x)[0]
+                val magnitude = hypot(valX, valY)
+                if (magnitude > 10.0) {
+                    val angle = Math.atan2(valY, valX)
+                    val length = step / 1.5
+                    val x2 = x + length * Math.cos(angle)
+                    val y2 = y + length * Math.sin(angle)
+                    Imgproc.arrowedLine(
+                        dst,
+                        org.opencv.core.Point(x.toDouble(), y.toDouble()),
+                        org.opencv.core.Point(x2, y2),
+                        color,
+                        1,
+                        8,
+                        0,
+                        0.3
+                    )
+                }
+            }
+        }
+        return ImageMatrix(dst, matrixImage!!)
+    }
     //Morfologia
     @FXML
     lateinit var morphKernelGroup: ToggleGroup
@@ -1130,15 +1168,48 @@ class BasicViewController {
     @FXML lateinit var wienerNoiseSlider: Slider
     @FXML lateinit var wienerKernelSpinner: Spinner<Int>
     var spectrumShow: String = "NONE"
+    @FXML
     fun onapplyDFTClick(event: ActionEvent) {
         matrixImage ?: return
-        if(spectrumShow == "NONE" || spectrumShow == "DCT"){
-            spectrumShow = "DFT"
-            imageController.saveToHistory(matrixImage!!)
-            matrixImage = frequencyController.applyDFT(matrixImage!!)
-        }else{
-            matrixImage = imageController.undo(matrixImage!!)
-            spectrumShow = "NONE"
+        when (spectrumShow) {
+            "NONE" -> {
+                spectrumShow = "DFT"
+                imageController.saveToHistory(matrixImage!!)
+                matrixImage = frequencyController.applyDFT(matrixImage!!)
+            }
+            "DFT" -> {
+                matrixImage = imageController.undo(matrixImage!!)
+                spectrumShow = "NONE"
+            }
+            else -> {
+                spectrumShow = "DFT"
+                matrixImage = imageController.undo(matrixImage!!)
+                imageController.saveToHistory(matrixImage!!)
+                matrixImage = frequencyController.applyDFT(matrixImage!!)
+            }
+        }
+        imageController.changeView(matrixImage!!)
+    }
+
+    @FXML
+    fun onapplyDFTClickPhase(event: ActionEvent) {
+        matrixImage ?: return
+        when (spectrumShow) {
+            "NONE" -> {
+                spectrumShow = "PHASE"
+                imageController.saveToHistory(matrixImage!!)
+                matrixImage = frequencyController.applyDFTPhase(matrixImage!!)
+            }
+            "PHASE" -> {
+                matrixImage = imageController.undo(matrixImage!!)
+                spectrumShow = "NONE"
+            }
+            else -> {
+                spectrumShow = "PHASE"
+                matrixImage = imageController.undo(matrixImage!!)
+                imageController.saveToHistory(matrixImage!!)
+                matrixImage = frequencyController.applyDFTPhase(matrixImage!!)
+            }
         }
         imageController.changeView(matrixImage!!)
     }
@@ -1146,13 +1217,22 @@ class BasicViewController {
     @FXML
     fun onShowDCTSpectrum(event: ActionEvent) {
         matrixImage ?: return
-        if(spectrumShow == "NONE" || spectrumShow == "DFT"){
-            spectrumShow = "DCT"
-            imageController.saveToHistory(matrixImage!!)
-            matrixImage = frequencyController.applyDCT(matrixImage!!)
-        }else{
-            matrixImage = imageController.undo(matrixImage!!)
-            spectrumShow = "NONE"
+        when (spectrumShow) {
+            "NONE" -> {
+                spectrumShow = "DCT"
+                imageController.saveToHistory(matrixImage!!)
+                matrixImage = frequencyController.applyDCT(matrixImage!!)
+            }
+            "DCT" -> {
+                matrixImage = imageController.undo(matrixImage!!)
+                spectrumShow = "NONE"
+            }
+            else -> {
+                spectrumShow = "DCT"
+                matrixImage = imageController.undo(matrixImage!!)
+                imageController.saveToHistory(matrixImage!!)
+                matrixImage = frequencyController.applyDCT(matrixImage!!)
+            }
         }
         imageController.changeView(matrixImage!!)
     }

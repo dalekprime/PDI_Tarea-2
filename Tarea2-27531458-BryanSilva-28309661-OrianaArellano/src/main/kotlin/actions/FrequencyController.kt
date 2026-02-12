@@ -57,6 +57,32 @@ class FrequencyController {
         return ImageMatrix(result)
     }
 
+    fun applyDFTPhase(input: ImageMatrix): ImageMatrix {
+        val src = input.image
+        val gray = Mat()
+        if (src.channels() > 1) {
+            Imgproc.cvtColor(src, gray, Imgproc.COLOR_BGR2GRAY)
+        } else {
+            src.copyTo(gray)
+        }
+        val floatImg = Mat()
+        gray.convertTo(floatImg, CvType.CV_32F)
+        val complex = ArrayList<Mat>()
+        complex.add(floatImg)
+        complex.add(Mat.zeros(floatImg.size(), CvType.CV_32F))
+        val complexI = Mat()
+        Core.merge(complex, complexI)
+        Core.dft(complexI, complexI)
+        Core.split(complexI, complex)
+        val phaseMat = Mat()
+        Core.phase(complex[0], complex[1], phaseMat)
+        shiftQuadrants(phaseMat)
+        Core.normalize(phaseMat, phaseMat, 0.0, 255.0, Core.NORM_MINMAX)
+        val result = Mat()
+        phaseMat.convertTo(result, CvType.CV_8U)
+        return ImageMatrix(result)
+    }
+
     fun applyDCT(input: ImageMatrix): ImageMatrix {
         val src = input.image
 
