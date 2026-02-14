@@ -291,7 +291,7 @@ class FrequencyController {
         val rows = Core.getOptimalDFTSize(src.rows())
         val cols = Core.getOptimalDFTSize(src.cols())
 
-        val spatialMask = Mat.zeros(rows, cols, CvType.CV_32F)
+        val spatialMask = Mat(rows, cols, CvType.CV_32F)
         val cx = cols / 2
         val cy = rows / 2
         var area = 0.0
