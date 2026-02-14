@@ -327,6 +327,17 @@ class BasicViewController {
         // WB
         wbUSlider.valueProperty().addListener { _, _, _ -> applyWB() }
         wbVSlider.valueProperty().addListener { _, _, _ -> applyWB() }
+
+        // Configurar Slider de RADIO (H)
+        wienerRadiusSlider.min = 1.0
+        wienerRadiusSlider.max = 50.0
+        wienerRadiusSlider.value = 10.0
+
+        // Slider de la Constante K (Escala microscópica)
+        wienerKSlider.min = 0.0      // 0.0 equivale al Filtro Inverso puro (G = F/H)
+        wienerKSlider.max = 0.05     // Máximo muy bajo para dar precisión al ratón
+        wienerKSlider.value = 0.0006 // Muy cerca del valor del PDF del profesor
+        wienerKSlider.blockIncrement = 0.0001 // Pasos ultra finos
     }
 
     //Umbral Simple
@@ -1144,6 +1155,14 @@ class BasicViewController {
         imageController.changeView(matrixImage!!)
     }
 
+    @FXML
+    fun onApplyAutoWBClick(event: ActionEvent) {
+        matrixImage ?: return
+        imageController.saveToHistory(matrixImage!!)
+        matrixImage = tonoController.autoWhiteBalanceYUV(matrixImage!!)
+        imageController.changeView(matrixImage!!)
+    }
+
     //Cuantizacion
     @FXML lateinit var quantLevelSpinner: Spinner<Int>
     @FXML lateinit var quantMethodGroup: ToggleGroup
@@ -1280,6 +1299,27 @@ class BasicViewController {
         val noise = wienerNoiseSlider.value
         val kernel = wienerKernelSpinner.value.toString().toInt()
         matrixImage = noLinearController.applyWiener(matrixImage!!, kernel, noise)
+        imageController.changeView(matrixImage!!)
+    }
+
+    @FXML lateinit var wienerRadiusSlider: Slider
+    @FXML lateinit var wienerKSlider: Slider
+
+    @FXML
+    fun onApplyWienerFrequencyClick(event: ActionEvent) {
+        matrixImage ?: return
+        imageController.saveToHistory(matrixImage!!)
+
+        // Leemos los valores directamente de los Sliders
+        val blurRadius = wienerRadiusSlider.value
+        val kConstant = wienerKSlider.value
+
+        println("Aplicando Wiener Frecuencial -> Radio H: $blurRadius, Constante K: $kConstant")
+
+        // Aplicamos la matemática
+        matrixImage = frequencyController.applyWienerFrequency(matrixImage!!, blurRadius, kConstant)
+
+        // Actualizamos la vista
         imageController.changeView(matrixImage!!)
     }
 }

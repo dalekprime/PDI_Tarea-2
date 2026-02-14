@@ -281,4 +281,116 @@ class FrequencyController {
         tmp.copyTo(q2)
     }
 
+    fun applyWienerFrequency(imageMatrix: ImageMatrix, blurRadius: Double, k: Double): ImageMatrix {
+        val src = imageMatrix.image
+
+        val channels = ArrayList<Mat>()
+        Core.split(src, channels)
+        val resultChannels = ArrayList<Mat>()
+
+        val rows = Core.getOptimalDFTSize(src.rows())
+        val cols = Core.getOptimalDFTSize(src.cols())
+
+        val spatialMask = Mat.zeros(rows, cols, CvType.CV_32F)
+        val cx = cols / 2
+        val cy = rows / 2
+        var area = 0.0
+
+        // Dibujamos un círculo perfecto (Filtro de media redondo)
+        for (y in 0 until rows) {
+            for (x in 0 until cols) {
+                val distSq = (x - cx) * (x - cx) + (y - cy) * (y - cy)
+                if (distSq <= blurRadius * blurRadius) {
+                    spatialMask.put(y, x, 1.0)
+                    area++
+                }
+            }
+        }
+
+        // Normalizamos para que la suma de los píxeles sea 1
+        if (area > 0) {
+            Core.divide(spatialMask, Scalar.all(area), spatialMask)
+        }
+
+        // Centramos la máscara en el origen (0,0) ANTES de la DFT
+        shiftQuadrants(spatialMask)
+
+        // Calculamos la DFT de nuestra máscara para obtener H(u,v)
+        val complexH = ArrayList<Mat>()
+        complexH.add(spatialMask)
+        complexH.add(Mat.zeros(rows, cols, CvType.CV_32F))
+        val H = Mat()
+        Core.merge(complexH, H)
+        Core.dft(H, H)
+
+        // Extraemos la Parte Real e Imaginaria de H
+        val hChannels = ArrayList<Mat>()
+        Core.split(H, hChannels)
+        val hReal = hChannels[0]
+        val hImag = hChannels[1]
+
+        val hRealSq = Mat()
+        val hImagSq = Mat()
+        Core.multiply(hReal, hReal, hRealSq)
+        Core.multiply(hImag, hImag, hImagSq)
+
+        val hMagSq = Mat()
+        Core.add(hRealSq, hImagSq, hMagSq)
+
+        // Calcular el Denominador: (|H|^2 + k)
+        val denom = Mat()
+        Core.add(hMagSq, Scalar.all(k), denom)
+
+        // Calcular la fracción completa
+        val wReal = Mat()
+        val wImag = Mat()
+        Core.divide(hReal, denom, wReal)
+
+        val negHImag = Mat()
+        Core.multiply(hImag, Scalar.all(-1.0), negHImag)
+        Core.divide(negHImag, denom, wImag)
+
+        // Unimos W (Nuestra máscara de Wiener completa)
+        val wComplexArr = ArrayList<Mat>()
+        wComplexArr.add(wReal)
+        wComplexArr.add(wImag)
+        val W = Mat()
+        Core.merge(wComplexArr, W)
+
+        for (channel in channels) {
+            val floatImg = Mat()
+            channel.convertTo(floatImg, CvType.CV_32F)
+
+            val padded = Mat()
+            Core.copyMakeBorder(floatImg, padded, 0, rows - floatImg.rows(), 0, cols - floatImg.cols(), Core.BORDER_REFLECT, Scalar.all(0.0))
+
+            val complex = ArrayList<Mat>()
+            complex.add(padded)
+            complex.add(Mat.zeros(padded.size(), CvType.CV_32F))
+            val F = Mat()
+            Core.merge(complex, F)
+
+            // DFT de la imagen
+            Core.dft(F, F)
+
+            // G = F * W
+            val G = Mat()
+            Core.mulSpectrums(F, W, G, 0)
+
+            // IDFT
+            Core.idft(G, G, Core.DFT_SCALE or Core.DFT_REAL_OUTPUT)
+
+            val result = Mat()
+            G.convertTo(result, CvType.CV_8U)
+
+            val finalChannel = result.submat(Rect(0, 0, src.cols(), src.rows()))
+            resultChannels.add(finalChannel)
+        }
+
+        val finalImage = Mat()
+        Core.merge(resultChannels, finalImage)
+
+        return ImageMatrix(finalImage)
+    }
+
 }

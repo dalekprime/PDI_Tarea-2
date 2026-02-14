@@ -270,6 +270,7 @@
                                                             <Slider fx:id="wbVSlider" min="0.0" max="2.0" value="1.0" blockIncrement="0.1"/>
 
                                                             <Button text="Aplicar WB" onAction="#onApplyWBClick" maxWidth="Infinity"/>
+                                                            <Button text="Aplicar WB Automatico" onAction="#onApplyAutoWBClick" maxWidth="Infinity"/>
                                                         </VBox>
 
                                                         <Separator opacity="0.3" prefWidth="200.0" />
@@ -687,6 +688,16 @@
                                                             <Slider fx:id="wienerNoiseSlider" blockIncrement="50.0" majorTickUnit="200.0" max="1000.0" min="10.0" showTickLabels="true" showTickMarks="true" value="400.0" />
 
                                                             <Button maxWidth="Infinity" onAction="#onApplyWiener" text="Aplicar Filtro Wiener" />
+                                                        </VBox>
+                                                        <Label style="-fx-font-weight: bold;" text="Filtro de Wiener (Frecuencia)" textFill="WHITE" />
+                                                        <VBox spacing="10.0" styleClass="panel-box">
+
+                                                            <Label text="Radio de Deformación (H):" textFill="#aaaaaa" />
+                                                            <Slider fx:id="wienerRadiusSlider" blockIncrement="1.0" majorTickUnit="10.0" max="50.0" min="1.0" showTickLabels="true" showTickMarks="true" value="15.0" />
+
+                                                            <Label text="Constante K (Ruido):" textFill="#aaaaaa" />
+                                                            <Slider fx:id="wienerKSlider" blockIncrement="0.0001" majorTickUnit="0.01" max="0.05" min="0.0" showTickLabels="true" showTickMarks="true" value="0.0006" />
+                                                            <Button maxWidth="Infinity" onAction="#onApplyWienerFrequencyClick" text="Aplicar Restauración" />
                                                         </VBox>
 
                                                     </children>

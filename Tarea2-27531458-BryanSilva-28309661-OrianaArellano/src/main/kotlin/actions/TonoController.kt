@@ -148,4 +148,28 @@ class TonoController {
         channels.forEach { it.release() }
         return ImageMatrix(dst, imageMatrix)
     }
+
+    fun autoWhiteBalanceYUV(imageMatrix: ImageMatrix): ImageMatrix {
+        val src = imageMatrix.image.clone()
+        val yuv = Mat()
+        //Convertir al espacio YUV
+        Imgproc.cvtColor(src, yuv, Imgproc.COLOR_BGR2YUV)
+        val channels = ArrayList<Mat>()
+        //Separar canales
+        Core.split(yuv, channels)
+        val uMean = Core.mean(channels[1]).`val`[0]
+        val vMean = Core.mean(channels[2]).`val`[0]
+        val uShift = 128.0 - uMean
+        val vShift = 128.0 - vMean
+        //Desplzar espectro
+        Core.add(channels[1], Scalar(uShift), channels[1])
+        Core.add(channels[2], Scalar(vShift), channels[2])
+        Core.merge(channels, yuv)
+        val dst = Mat()
+        Imgproc.cvtColor(yuv, dst, Imgproc.COLOR_YUV2BGR)
+        src.release()
+        yuv.release()
+        channels.forEach { it.release() }
+        return ImageMatrix(dst, imageMatrix)
+    }
 }
