@@ -106,8 +106,9 @@ class TonoController {
         if (hueShift != 0.0) {
             val lut = Mat(1, 256, CvType.CV_8U)
             val data = ByteArray(256)
+            val hueShiftReal = hueShift / 2.0
             for (i in 0..255) {
-                var newVal = (i + hueShift.toInt()) % 180
+                var newVal = (i + hueShiftReal.toInt()) % 180
                 if (newVal < 0) newVal += 180
                 data[i] = newVal.toByte()
             }

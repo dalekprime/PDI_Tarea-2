@@ -54,7 +54,7 @@ class QuantizationController {
             labels,
             criteria,
             3,
-            Core.KMEANS_PP_CENTERS,
+            Core.KMEANS_RANDOM_CENTERS,
             centers
         )
         val dst = Mat(src.size(), src.type())

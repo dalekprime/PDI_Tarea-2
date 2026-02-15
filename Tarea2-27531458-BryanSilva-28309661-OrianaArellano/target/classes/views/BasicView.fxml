@@ -243,14 +243,20 @@
                                                                     <Font name="System Bold" size="12.0" />
                                                                 </font>
                                                             </Label>
-
-                                                            <Label text="Matiz (Hue)" textFill="#aaaaaa"/>
+                                                            <HBox spacing="5.0" >
+                                                                <Label text="Matiz (Hue)" textFill="#aaaaaa"/>
+                                                                <Label text="( 0 )" textFill="#aaaaaa" fx:id="hueLabel"/>
+                                                            </HBox>
                                                             <Slider fx:id="hueSlider" min="-180" max="180" value="0" blockIncrement="1"/>
-
-                                                            <Label text="Saturación" textFill="#aaaaaa"/>
-                                                            <Slider fx:id="satSlider" min="-100" max="100" value="0"/>
-
-                                                            <Label text="Luminosidad" textFill="#aaaaaa"/>
+                                                            <HBox spacing="5.0" >
+                                                                <Label text="Saturación" textFill="#aaaaaa"/>
+                                                                <Label text="( 0 )" textFill="#aaaaaa"  fx:id="satLabel"/>
+                                                            </HBox>
+                                                            <Slider fx:id="satSlider" min="-100" max="100" value="0" />
+                                                            <HBox spacing="5.0" >
+                                                                <Label text="Luminosidad" textFill="#aaaaaa"/>
+                                                                <Label text="( 0 )" textFill="#aaaaaa"  fx:id="lumLabel"/>
+                                                            </HBox>
                                                             <Slider fx:id="lumSlider" min="-100" max="100" value="0"/>
 
                                                             <Button text="Aplicar Cambios HLS" onAction="#onApplyHLSClick" maxWidth="Infinity"/>

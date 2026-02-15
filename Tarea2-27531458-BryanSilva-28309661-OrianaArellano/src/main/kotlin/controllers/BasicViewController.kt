@@ -42,6 +42,7 @@ import org.opencv.core.Scalar
 import org.opencv.imgproc.Imgproc
 import javax.swing.text.StyledEditorKit
 import kotlin.math.hypot
+import kotlin.math.roundToInt
 
 class BasicViewController {
 
@@ -338,6 +339,7 @@ class BasicViewController {
         wienerKSlider.max = 0.05     // Máximo muy bajo para dar precisión al ratón
         wienerKSlider.value = 0.0006 // Muy cerca del valor del PDF del profesor
         wienerKSlider.blockIncrement = 0.0001 // Pasos ultra finos
+
     }
 
     //Umbral Simple
@@ -1103,6 +1105,12 @@ class BasicViewController {
     lateinit var wbUSlider: Slider
     @FXML
     lateinit var wbVSlider: Slider
+    @FXML
+    lateinit var hueLabel: Label
+    @FXML
+    lateinit var satLabel: Label
+    @FXML
+    lateinit var lumLabel: Label
 
     private fun applyHLS() {
         matrixImage ?: return
@@ -1112,6 +1120,9 @@ class BasicViewController {
             satSlider.value,
             lumSlider.value
         )
+        hueLabel.text = "( ${hueSlider.value.roundToInt()} )"
+        satLabel.text = "( ${satSlider.value.roundToInt()} )"
+        lumLabel.text = "( ${lumSlider.value.roundToInt()} )"
         imageController.changeView(preview)
     }
 
